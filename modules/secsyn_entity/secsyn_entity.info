@@ -1,0 +1,10 @@
+name = Entity Syndication
+description = "Provides an API for syndicating entities."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn
+dependencies[] = uuid
+dependencies[] = entity
+
+files[] = SecureSyndicationEntityProfile.inc

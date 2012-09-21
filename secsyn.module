@@ -1,0 +1,67 @@
+<?php
+
+function secsyn_permission() {
+  return array(
+    'syndicate object' => array(
+      'title' => t('Queue objects for syndication'),
+      'description' => t('Users will be able to queue objects to be syndicated to remove servers'),
+      'restrict access' => TRUE,
+    ),
+    'trigger syndication' => array(
+      'title' => t('Trigger syndication immediately'),
+      'description' => t('Users will be able to trigger the syndication process'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+function secsyn_menu() {
+  return array(
+    'admin/content/syndication' => array(
+      'title' => 'Syndication',
+      'description' => 'List of all the items on the syndication queue',
+      'page callback' => 'secsyn_status_page',
+      'access arguments' => array('trigger syndication'),
+      'file' => 'secsyn.pages.inc',
+      'type' => MENU_NORMAL_ITEM,
+    ),
+    'admin/content/syndication/report' => array(
+      'title' => 'Syndication',
+      'description' => 'List of all the items on the syndication queue',
+      'page callback' => 'secsyn_status_page',
+      'access arguments' => array('trigger syndication'),
+      'file' => 'secsyn.pages.inc',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => 0,
+    ),
+    'admin/content/syndication/go' => array(
+      'title' => 'Force Syndicate',
+      'description' => 'Triggers syndication immediately',
+      'page callback' => 'secsyn_syndicate_all',
+      'access arguments' => array('trigger syndication'),
+      'file' => 'secsyn.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 20,
+    )
+  );
+}
+
+function secsyn_cron() {
+  module_load_include('secsyn', 'inc', 'secsyn.pages');
+  secsyn_syndicate_all(TRUE);
+}
+
+function secsyn_twoway_service() {
+  return array(
+    'check' => array(
+      'callback' => 'secsyn_service_do_check',
+      'service_file' => 'services/secsyn.check.inc',
+      'description' => 'Verifies which objects need to be synchronized',
+    ),
+    'sync' => array(
+      'callback' => 'secsyn_service_do_sync',
+      'service_file' => 'services/secsyn.sync.inc',
+      'description' => 'Synchronizes objects with the remote server'
+    ),
+  );
+}

@@ -1,0 +1,12 @@
+name = Secure Syndication
+description = "Provides a secure method of syndicating content between servers."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = unique_queue
+dependencies[] = twoway
+
+files[] = classes/SecureSyndicationProfile.inc
+files[] = classes/SecureSyndicationEngine.inc
+
+version = "7.x-1.0-dev"

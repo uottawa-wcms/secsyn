@@ -1,0 +1,7 @@
+<?php
+
+function secsyn_auto_menu() {
+  return array(
+    ''
+  );
+}

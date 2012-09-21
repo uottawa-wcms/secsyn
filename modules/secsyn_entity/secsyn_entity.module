@@ -1,0 +1,60 @@
+<?php
+
+function secsyn_entity_secsyn_profiles() {
+  return array(
+    'SyndicationEntityProfile'
+  );
+}
+
+function secsyn_entity_entity_load($entities, $type) {
+  foreach ($entities as $entity) {
+    $entity->entity_type = $type;
+  }
+}
+
+function secsyn_entity_secsyn_field_dependency($field, $instance, $entity) {
+  $dependencies = array();
+  switch ($field['type']) {
+    case 'entityreference':
+      $entity_type = $field['settings']['target_type'];
+      foreach ($entity->{$instance['field_name']} as $lang => $list) {
+        foreach ($list as $uuid) {
+          $ref = entity_uuid_load($entity_type, array($uuid['target_id']));
+          $ref = reset($term);
+          $dependencies[] = array(
+            'profile' => 'SecureSyndicationEntityProfile',
+            'object' => $ref,
+          );
+        }
+      }
+      break;
+    case 'taxonomy_term_reference':
+      foreach ($entity->{$instance['field_name']} as $lang => $list) {
+        foreach ($list as $uuid) {
+          $term = entity_uuid_load('taxonomy_term', array($uuid['tid']));
+          $term = reset($term);
+          $dependencies[] = array(
+            'profile' => 'SecureSyndicationEntityProfile',
+            'object' => $term,
+          );
+        }
+      }
+      break;
+  }
+  return $dependencies;
+}
+
+function secsyn_entity_secsyn_entity_dependency($entity) {
+  $dependencies = array();
+  if ($entity->entity_type == 'node') {
+    if (!empty($entity->tnid)) {
+      if ($entity->tnid != $entity->nid) {
+        $dependencies[] = array(
+          'profile' => 'SecureSyndicationEntityProfile',
+          'object' => reset(entity_uuid_load('node', array($entity->tnid))),
+        );
+      }
+    }
+  }
+  return $dependencies;
+}

@@ -1,0 +1,16 @@
+<?php
+
+function secsyn_node_menu() {
+  return array(
+    'node/%node/syndicate' => array(
+      'title' => 'Syndicate',
+      'description' => 'Syndicate an object to a remote server',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_node_syndicate_form', 1),
+      'access arguments' => array('syndicate object'),
+      'file' => 'secsyn_node.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+    )
+  );
+}
+

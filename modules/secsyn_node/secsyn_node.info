@@ -1,0 +1,8 @@
+name = Node Syndication
+description = "Provides an interface for syndicating nodes."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn_entity
+
+version = "7.x-1.0-alpha1"
