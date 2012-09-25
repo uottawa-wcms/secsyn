@@ -1,7 +1,83 @@
 <?php
 
+/**
+ * Auto Syndicator:
+ * - list of profiles that participate
+ * - filter settings for each profile
+ */
+
 function secsyn_auto_menu() {
   return array(
-    ''
+    'admin/content/syndication/auto' => array(
+      'title' => 'Auto Syndicate',
+      'page callback' => 'secsyn_auto_summary_page',
+      'access arguments' => array('bulk syndicate'),
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'secsyn_auto.pages.inc',
+    ),
+    'admin/content/syndication/auto/create' => array(
+      'title' => 'Create Auto Syndicator',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_auto_syndicator_form'),
+      'access arguments' => array('bulk syndicate'),
+      'type' => MENU_LOCAL_ACTION,
+      'file' => 'secsyn_auto.pages.inc',
+    ),
+    'admin/content/syndication/auto/%secsyn_auto/edit' => array(
+      'title' => 'Edit Auto Syndicator',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_auto_syndicator_form', 4),
+      'access arguments' => array('bulk syndicate'),
+      'type' => MENU_CALLBACK,
+      'file' => 'secsyn_auto.pages.inc',
+    ),
+    'admin/content/syndication/auto/%secsyn_auto/delete' => array(
+      'title' => 'Delete Auto Syndicator',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_auto_delete_syndicator_form', 4),
+      'access arguments' => array('bulk syndicate'),
+      'type' => MENU_CALLBACK,
+      'file' => 'secsyn_auto.pages.inc',
+    ),
   );
+}
+
+function secsyn_auto_secsyn_precron() {
+  $list = db_query('
+    SELECT *
+    FROM {secsyn_auto_config}
+  ');
+  module_load_include('inc', 'secsyn_auto', 'secsyn_auto.functions');
+  foreach ($list as $syndicator) {
+    secsyn_auto_check_queue($syndicator);
+  }
+}
+
+function secsyn_auto_load($machine_name) {
+  $rs = db_query('
+    SELECT *
+    FROM {secsyn_auto_config}
+    WHERE machine_name = :machine
+  ', array(
+    ':machine' => $machine_name,
+  ));
+  if ($rs->rowCount() > 0) {
+    $object = $rs->fetchObject();
+    if ($object->urgent == 'Y') {
+      if (!user_access('urgent syndication')) {
+        return FALSE;
+      }
+    }
+    return $object;
+  } else {
+    return FALSE;
+  }
+}
+
+function _secsyn_auto_syndicator_name_check($machine_name) {
+  if (secsyn_auto_load($machine_name)) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }

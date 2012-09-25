@@ -1,0 +1,73 @@
+<?php
+
+function secsyn_auto_schema() {
+  return array(
+    'secsyn_auto_config' => _secsyn_auto_schema_config(),
+  );
+}
+
+/**
+ * Table definition for secsyn_auto_config
+ */
+function _secsyn_auto_schema_config() {
+  return array(
+    'fields' => array(
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'enabled' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 'Y',
+      ),
+      'urgent' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 'N',
+      ),
+      'remote_server_machine' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'machine_name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'filter_name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'last_execution' => array(
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'execution_min_delay' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array(
+      'machine_name',
+    ),
+    'unique keys' => array(),
+    'indexes' => array(),
+  );
+}

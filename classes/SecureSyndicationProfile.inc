@@ -37,7 +37,8 @@ abstract class SecureSyndicationProfile {
   public function hash($object, $lookup_fields = NULL) {
     $object = $this->package($object);
     if (!empty($lookup_fields)) {
-      foreach (get_object_vars($object) as $property) {
+      $props = array_keys(get_object_vars($object));
+      foreach ($props as $property) {
         if (!in_array($property, $lookup_fields)) {
           unset($object->{$property});
         }
@@ -52,12 +53,31 @@ abstract class SecureSyndicationProfile {
 
   public abstract function uuid($object);
 
-  public abstract function filters();
-
-  public abstract function queueAll($filters);
-
   public function version() {
     return 1;
+  }
+
+  /**
+   * These methods are included in support of secsyn_filters.
+   */
+  public function filters() {
+    return array();
+  }
+
+  public function filteredList($filter_params) {
+    return array();
+  }
+
+  public function countList($filter_params) {
+    return 0;
+  }
+
+  public function queueAll($remote_server, $filter_params, $urgent = FALSE) {
+    return TRUE;
+  }
+
+  public function queueSelect($filter_params, $ids) {
+    return TRUE;
   }
 
 }

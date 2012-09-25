@@ -3,6 +3,6 @@ description = "Provides an interface for setting up automatic syndication."
 core = 7.x
 package = Secure Syndication
 
-dependencies[] = secsyn
+dependencies[] = secsyn_filters
 
 version = "7.x-1.0-dev"

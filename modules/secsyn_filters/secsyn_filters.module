@@ -1,0 +1,135 @@
+<?php
+
+function secsyn_filters_menu() {
+  return array(
+    'admin/content/syndication/filters' => array(
+      'title' => 'Filters',
+      'page callback' => 'secsyn_filters_filter_list',
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_filters.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+    ),
+    'admin/content/syndication/filters/add' => array(
+      'title' => 'Add Filter',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_filters_filter_form'),
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_filters.pages.inc',
+      'type' => MENU_LOCAL_ACTION,
+    ),
+    'admin/content/syndication/filters/%secsyn_filters_profile/edit' => array(
+      'title' => 'Edit Filter',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_filters_filter_form', 4),
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_filters.pages.inc',
+      'type' => MENU_CALLBACK,
+    ),
+    'admin/content/syndication/filters/%secsyn_filters_profile/delete' => array(
+      'title' => 'Delete Filter',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_filters_delete_filter_form', 4),
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_filters.pages.inc',
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+function secsyn_filters_queue_all($remote_server, $profile, $urgent = FALSE) {
+  $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
+  return $sync_profile->queueAll($remote_server, secsyn_filters_build_options($profile), $urgent);
+}
+
+function secsyn_filters_count_content($profile) {
+  $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
+  return $sync_profile->countList(secsyn_filters_build_options($profile));
+}
+
+function secsyn_filters_get_content($profile) {
+  $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
+  return $sync_profile->filteredList(secsyn_filters_build_options($profile));
+}
+
+function secsyn_filters_build_options($profile) {
+  $filter_options = array(
+    'mode' => $profile->mode, // mode is currently not used but included to be forwards-compatible
+    'filters' => array()
+  );
+  foreach ($profile->components as $component) {
+    $filter_options['filters'][$component->local_order] = array(
+      'filter_key' => $component->filter_key,
+      'filter_options' => $component->filter_options,
+    );
+  }
+  return $filter_options;
+}
+
+function secsyn_filters_profile_load($profile_key) {
+  $rs = db_query("
+    SELECT *
+    FROM {secsyn_filters_profile}
+    WHERE machine_name = :machine
+  ", array(
+    ":machine" => $profile_key,
+  ));
+  if ($rs->rowCount() > 0) {
+    $profile = $rs->fetchObject();
+    secsyn_filters_components_load($profile);
+    return $profile;
+  }
+  return FALSE;
+}
+
+function secsyn_filters_components_load(&$profile) {
+  $rs = db_query("
+    SELECT *
+    FROM {secsyn_filters_component}
+    WHERE profile_name = :machine
+    ORDER BY local_order ASC
+  ", array(
+    ':machine' => $profile->machine_name,
+  ));
+  $profile->components = array();
+  foreach ($rs as $row) {
+    $row->filter_options = unserialize($row->filter_options);
+    $profile->components[] = $row;
+
+  }
+}
+
+function secsyn_filters_profile_save($profile) {
+  $components = array();
+  if (property_exists($profile, 'components')) {
+    $components = $profile->components;
+    unset($profile->components);
+  }
+  $tx = db_transaction();
+  try {
+    db_merge('secsyn_filters_profile')
+      ->key(array('machine_name' => $profile->machine_name))
+      ->fields((array) $profile)
+      ->execute();
+    db_delete('secsyn_filters_component')
+      ->condition('profile_name', $profile->machine_name)
+      ->execute();
+    foreach ($components as $component) {
+      $component->profile_name = $profile->machine_name;
+      $component->filter_options = serialize($component->filter_options);
+      db_insert('secsyn_filters_component')
+        ->fields((array) $component)
+        ->execute();
+    }
+  } catch (Exception $e) {
+    $tx->rollback();
+    throw $e;
+  }
+}
+
+function _secsyn_filters_profile_machine_name_check($name) {
+  if (secsyn_filters_profile_load($name)) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}

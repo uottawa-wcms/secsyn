@@ -5,11 +5,20 @@ function secsyn_permission() {
     'syndicate object' => array(
       'title' => t('Queue objects for syndication'),
       'description' => t('Users will be able to queue objects to be syndicated to remove servers'),
+    ),
+    'bulk syndicate' => array(
+      'title' => t('Queue objects in bulk for syndication'),
+      'description' => t('Users will be able to queue objects in bulk to be syndicated'),
       'restrict access' => TRUE,
     ),
     'trigger syndication' => array(
       'title' => t('Trigger syndication immediately'),
       'description' => t('Users will be able to trigger the syndication process'),
+      'restrict access' => TRUE,
+    ),
+    'urgent syndication' => array(
+      'title' => t('Urgent syndication'),
+      'description' => t('Users will be able to trigger urgent syndications'),
       'restrict access' => TRUE,
     ),
   );
@@ -18,7 +27,7 @@ function secsyn_permission() {
 function secsyn_menu() {
   return array(
     'admin/content/syndication' => array(
-      'title' => 'Syndication',
+      'title' => 'Syndication Command Centre',
       'description' => 'List of all the items on the syndication queue',
       'page callback' => 'secsyn_status_page',
       'access arguments' => array('trigger syndication'),
@@ -37,7 +46,7 @@ function secsyn_menu() {
     'admin/content/syndication/go' => array(
       'title' => 'Force Syndicate',
       'description' => 'Triggers syndication immediately',
-      'page callback' => 'secsyn_syndicate_all',
+      'page callback' => 'secsyn_force_page',
       'access arguments' => array('trigger syndication'),
       'file' => 'secsyn.pages.inc',
       'type' => MENU_LOCAL_TASK,
@@ -47,7 +56,8 @@ function secsyn_menu() {
 }
 
 function secsyn_cron() {
-  module_load_include('secsyn', 'inc', 'secsyn.pages');
+  module_invoke_all('secsyn_precron');
+  module_load_include('inc', 'secsyn', 'secsyn.functions');
   secsyn_syndicate_all(TRUE);
 }
 

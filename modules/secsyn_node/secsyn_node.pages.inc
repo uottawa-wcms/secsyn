@@ -10,6 +10,12 @@ function secsyn_node_syndicate_form($form, &$state, $node) {
     '#default' => array(),
     '#empty_value' => '',
   );
+  if (user_access('urgent syndication')) {
+    $form['urgency'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Urgent: Push ASAP'),
+    );
+  }
   $form['nid'] = array(
     '#type' => 'value',
     '#value' => $node->nid,
@@ -25,6 +31,10 @@ function secsyn_node_syndicate_form_submit($form, &$form_state) {
   $node = node_load($form_state['values']['nid']);
   $remote_server = twoway_server_load($form_state['values']['remote_server']);
   $engine = new SecureSyndicationEngine();
+  $urgent = FALSE;
+  if (!empty($form_state['values']['urgency'])) {
+    $urgent = TRUE;
+  }
   if ($engine->queue($remote_server['server_connection'], 'SecureSyndicationEntityProfile', $node)) {
     drupal_set_message(t('Content has been queued for syndication'));
   }

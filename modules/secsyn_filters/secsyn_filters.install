@@ -1,0 +1,89 @@
+<?php
+
+function secsyn_filters_schema() {
+  return array(
+    'secsyn_filters_profile' => _secsyn_filters_schema_profile(),
+    'secsyn_filters_component' => _secsyn_filters_schema_component(),
+  );
+}
+
+/**
+ * Table definition for secsyn_filters_components
+ */
+function _secsyn_filters_schema_component() {
+  return array(
+    'fields' => array(
+      'local_order' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'filter_key' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'filter_options' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'profile_name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+    ),
+    'primary key' => array('profile_name', 'local_order'),
+    'unique keys' => array(),
+    'indexes' => array(),
+  );
+}
+
+/**
+ * Table definition for secsyn_filters_profile
+ */
+function _secsyn_filters_schema_profile() {
+  return array(
+    'fields' => array(
+      'machine_name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'sync_profile_name' => array(
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'mode' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 'A',
+      ),
+
+    ),
+    'primary key' => array(
+      'machine_name',
+    ),
+    'unique keys' => array(),
+    'indexes' => array(),
+  );
+}
