@@ -1,0 +1,8 @@
+name = Pull Syndication
+description = "Provides an interface for choosing files from a filter to pull from a remote server."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn_filters
+
+version = "7.x-1.0-dev"

@@ -1,0 +1,35 @@
+<?php
+
+function secsyn_pull_twoway_service() {
+  return array(
+    'filter_list' => array(
+      'callback' => 'secsyn_pull_service_get_filter_list',
+      'service_file' => 'services/secsyn_pull.filter_list.inc',
+      'description' => 'Provides a list of filters available',
+    ),
+    'filter_data' => array(
+      'callback' => 'secsyn_pull_service_get_filter_data',
+      'service_file' => 'services/secsyn_pull.filter_data.inc',
+      'description' => 'Provides the list of objects that currently match a filter',
+    ),
+    'queue' => array(
+      'callback' => 'secsyn_pull_service_do_queue',
+      'service_file' => 'services/secsyn_pull.queue.inc',
+      'description' => 'Queues the items specified by the requesting server to syndicate back',
+    ),
+  );
+}
+
+function secsyn_pull_menu() {
+  return array(
+    'admin/content/syndication/pull' => array(
+      'title' => 'Content Pull',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_pull_form'),
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_pull.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 13,
+    )
+  );
+}
