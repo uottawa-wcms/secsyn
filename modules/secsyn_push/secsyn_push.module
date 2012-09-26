@@ -1,0 +1,14 @@
+<?php
+
+function secsyn_push_menu() {
+  return array(
+    'admin/content/syndication/push' => array(
+      'title' => 'Content Push',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_push_form'),
+      'access arguments' => array('bulk syndicate'),
+      'file' => 'secsyn_push.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+    ),
+  );
+}
