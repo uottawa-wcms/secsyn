@@ -15,6 +15,31 @@ function secsyn_entity_entity_info_alter(&$entity_info) {
   }
 }
 
+function secsyn_entity_secsyn_entity_presave(&$object) {
+  $info = entity_get_info($object->entity_type);
+  if (!empty($info['entity keys']['revision'])) {
+    // TODO: Control revisions with a setting (or let others implement the hook?)
+    $object->revision = 1;
+  }
+  if ($object->entity_type == 'node') {
+    if (!empty($fields->tnid)) {
+      if ($fields->tnid == $fields->{$info['entity keys']['uuid']}) {
+        $object->secsyn_state['selfref_translation'] = TRUE;
+        $object->tnid = 0;
+      }
+    }
+  }
+}
+
+function secsyn_entity_secsyn_entity_postsave(&$object) {
+  if ($object->entity_type == 'node') {
+    if (!empty($object->secsyn_state['selfref_translation'])) {
+      $object->tnid = $object->nid;
+      entity_uuid_save($object->entity_type, $object);
+    }
+  }
+}
+
 function secsyn_entity_entity_load($entities, $type) {
   foreach ($entities as $entity) {
     $entity->entity_type = $type;

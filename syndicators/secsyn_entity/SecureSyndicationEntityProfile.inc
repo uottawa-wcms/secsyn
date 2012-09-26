@@ -41,36 +41,33 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
         unset($package->$field_name);
       }
     }
+    $this->invokeHook('secsyn_entity_package_alter', $package);
     return $package;
+  }
+
+  private function invokeHook($hookname, &$object) {
+    $modules = module_implements($hookname);
+    foreach ($modules as $module) {
+      $method = $module . '_' . $hookname;
+      if (function_exists($method)) {
+        $method($object);
+      }
+    }
   }
 
   public function update($uuid, $fields) {
     $uuid = $this->splitUUID($uuid);
     $info = entity_get_info($uuid['entity_type']);
-    if (!empty($info['entity keys']['revision'])) {
-      $fields->revision = 1;
-    }
     $fields->entity_type = $uuid['entity_type'];
     $uuid_field = $info['entity keys']['uuid'];
     $fields->$uuid_field = $uuid['uuid'];
-    // detect if this is a node with a tnid equal to itself
-    $primary_translation = FALSE;
-    if ($fields->entity_type == 'node') {
-      if (!empty($fields->tnid)) {
-        if ($fields->tnid == $fields->$uuid_field) {
-          $primary_translation = TRUE;
-          $fields->tnid = 0;
-        }
-      }
-    }
+    $object->secsyn_state = array();
+    $this->invokeHook('secsyn_entity_presave', $fields);
+    $state = $object->secsyn_state;
+    unset($object->secsyn_state);
     entity_uuid_save($uuid['entity_type'], $fields);
-    // the tnid was not saved (because it could not be looked up properly)
-    if ($primary_translation) {
-      // restore the UUID for tnid, because the save will overwrite it.
-      $fields->tnid = $fields->nid;
-      // resaving the entity will fix this problem.
-      entity_uuid_save($uuid['entity_type'], $fields);
-    }
+    $object->secsyn_state = $state;
+    $this->invokeHook('secsyn_entity_postsave', $fields);
     return TRUE;
   }
 
