@@ -6,6 +6,15 @@ function secsyn_entity_secsyn_profiles() {
   );
 }
 
+function secsyn_entity_entity_info_alter(&$entity_info) {
+  foreach (array_keys($entity_info) as $key) {
+    $entity_info[$key]['view modes']['secsyn_preview'] = array(
+      'label' => t('Syndication Preview'),
+      'custom settings' => TRUE,
+    );
+  }
+}
+
 function secsyn_entity_entity_load($entities, $type) {
   foreach ($entities as $entity) {
     $entity->entity_type = $type;

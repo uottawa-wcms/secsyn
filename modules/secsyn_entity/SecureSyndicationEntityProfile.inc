@@ -145,8 +145,15 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
       $results = $efq->execute();
       foreach ($results as $type => $entities) {
         foreach ($entities as $entity_id => $entity) {
-          $entity->entity_type = $type;
-          $list[] = $entity;
+          $object = reset(entity_load($type, $entity));
+          $uri = entity_uri($type, $object);
+          $standard = array(
+            'label' => entity_label($type, $object),
+            'link' => $uri['path'],
+            'uuid' => $this->uuid($object),
+            'preview' => entity_view($type, array($object), 'secsyn_preview'),
+          );
+          $list[] = $standard;
         }
       }
     }

@@ -111,7 +111,7 @@ class SecureSyndicationEngine {
       foreach ($dependencies as $dependency) {
         $dep_profile = SecureSyndicationProfile::getProfile($dependency['profile']);
         $dep_uuid = $dep_profile->uuid($dependency['object']);
-        if (!$this->queueForValidation($remote_server, $dependency['profile'], $dep_uuid)) {
+        if (!$this->queueForValidation($remote_server, $dependency['profile'], $dep_uuid, $urgent)) {
           $this->log('SSVQ: Could not queue dependency [@uuid] with profile [@profile]', array(
             '@uuid' => $dep_uuid,
             '@profile' => $dependency['profile'],

@@ -76,8 +76,4 @@ abstract class SecureSyndicationProfile {
     return TRUE;
   }
 
-  public function queueSelect($filter_params, $ids) {
-    return TRUE;
-  }
-
 }
