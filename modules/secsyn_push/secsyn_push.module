@@ -9,6 +9,7 @@ function secsyn_push_menu() {
       'access arguments' => array('bulk syndicate'),
       'file' => 'secsyn_push.pages.inc',
       'type' => MENU_LOCAL_TASK,
+      'weight' => 12,
     ),
   );
 }

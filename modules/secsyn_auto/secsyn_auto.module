@@ -14,6 +14,7 @@ function secsyn_auto_menu() {
       'access arguments' => array('bulk syndicate'),
       'type' => MENU_LOCAL_TASK,
       'file' => 'secsyn_auto.pages.inc',
+      'weight' => 11,
     ),
     'admin/content/syndication/auto/create' => array(
       'title' => 'Create Auto Syndicator',

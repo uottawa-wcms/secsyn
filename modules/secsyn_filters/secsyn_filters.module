@@ -8,6 +8,7 @@ function secsyn_filters_menu() {
       'access arguments' => array('bulk syndicate'),
       'file' => 'secsyn_filters.pages.inc',
       'type' => MENU_LOCAL_TASK,
+      'weight' => 10,
     ),
     'admin/content/syndication/filters/add' => array(
       'title' => 'Add Filter',

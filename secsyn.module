@@ -35,7 +35,7 @@ function secsyn_menu() {
       'type' => MENU_NORMAL_ITEM,
     ),
     'admin/content/syndication/report' => array(
-      'title' => 'Syndication',
+      'title' => 'Centre',
       'description' => 'List of all the items on the syndication queue',
       'page callback' => 'secsyn_status_page',
       'access arguments' => array('trigger syndication'),
@@ -44,7 +44,7 @@ function secsyn_menu() {
       'weight' => 0,
     ),
     'admin/content/syndication/go' => array(
-      'title' => 'Force Syndicate',
+      'title' => 'Force Push',
       'description' => 'Triggers syndication immediately',
       'page callback' => 'secsyn_force_page',
       'access arguments' => array('trigger syndication'),
