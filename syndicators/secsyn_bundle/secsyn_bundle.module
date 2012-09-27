@@ -1,12 +1,12 @@
 <?php
 
-function secsyn_field_secsyn_profiles() {
+function secsyn_bundle_secsyn_profiles() {
   return array(
     'SecureSyndicationBundleProfile' => t('Bundle Definitions')
   );
 }
 
-function secsyn_field_secsyn_entity_dependency($entity) {
+function secsyn_bundle_secsyn_entity_dependency($entity) {
   if (bundle_api_support($entity->entity_type)) {
     $bundle_key = bundle_api_get_bundle_key($entity->entity_type, $entity);
     return array(
