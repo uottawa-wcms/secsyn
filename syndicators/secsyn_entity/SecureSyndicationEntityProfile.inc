@@ -172,10 +172,6 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
     return TRUE;
   }
 
-  public function countList($filter_params) {
-    return count($this->filteredList($filter_params));
-  }
-
   private function getQueries($filter_params) {
     $queries = array();
     foreach ($filter_params['filters'] as $filter) {
