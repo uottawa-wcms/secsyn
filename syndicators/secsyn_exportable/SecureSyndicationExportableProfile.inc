@@ -3,26 +3,12 @@
 class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
 
   public function __construct() {
-    parent::__construct();
     ctools_include('export');
-  }
-
-  public function children($object) {
-    $children = array();
-    $instances = field_info_instances($object->entity_type, $object->bundle_name);
-    foreach ($instances as $instance) {
-      // TODO: Ignore certain fields
-      $children[] = array(
-        'profile' => 'SecureSyndicationFieldInstanceProfile',
-        'object' => $instance,
-      );
-    }
-    return $children;
   }
 
   public function package($object) {
     $schema = $this->getSchema($object->table);
-    $package = (array) $object;
+    $package = get_object_vars($object);
     unset($package[$schema['export']['primary key']]);
     return $package;
   }
@@ -30,11 +16,12 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
   public function update($uuid, $fields) {
     $pieces = explode('/', $uuid);
     $existing = $this->lookup($uuid);
-    if ($existing) {
-      $schema = $this->getSchema($pieces[0]);
-      $fields[$schema['export']['primary key']] = $existing[$schema['export']['primary key']];
+    if (!$existing) {
+      $existing = ctools_export_crud_new($pieces[0], TRUE);
     }
-    $fields = (object) $fields;
+    foreach ($fields as $key => $value) {
+      $existing->$key = $fields[$value];
+    }
     return ctools_export_crud_save($pieces[0], $fields);
   }
 
