@@ -1,0 +1,7 @@
+<?php
+
+function secsyn_exportable_secsyn_profiles() {
+  return array(
+    'SecureSyndicationExportableProfile' => t('Chaos Tools-Based Exportables')
+  );
+}

@@ -1,0 +1,9 @@
+name = Exportable Syndication
+description = "Provides an API for syndicating anything that is exportable."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn
+dependencies[] = ctools
+
+files[] = SecureSyndicationExportableProfile.inc
