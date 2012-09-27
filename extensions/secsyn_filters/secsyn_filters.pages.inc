@@ -112,10 +112,18 @@ function secsyn_filters_filter_form($form, &$form_state, $profile = NULL) {
       '#value' => $profile->machine_name,
     );
   }
+  $profiles = secsyn_get_profiles();
+  $profiles_with_filters = array();
+  foreach ($profiles as $key => $value) {
+    $syn_profile = SecureSyndicationProfile::getProfile($key);
+    if (count($syn_profile->filters())) {
+      $profiles_with_filters[$key] = $value;
+    }
+  }
   $form['filter_info']['sync_profile_name'] = array(
     '#type' => 'select',
     '#title' => t('Synchronization Profile'),
-    '#options' => secsyn_get_profiles(),
+    '#options' => $profiles_with_filters,
     '#default_value' => '',
     '#empty_value' => '',
     '#empty_option' => t('Select one...'),
