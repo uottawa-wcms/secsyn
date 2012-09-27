@@ -42,16 +42,4 @@ class SecureSyndicationFieldProfile extends SecureSyndicationProfile {
     return $object['field_name'];
   }
 
-  public function filteredList($filter_params) {
-    return array();
-  }
-
-  public function queueAll($remote_server, $filter_params, $urgent = FALSE) {
-    return FALSE;
-  }
-
-  public function filters() {
-    return array();
-  }
-
 }
