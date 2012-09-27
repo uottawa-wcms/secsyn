@@ -1,0 +1,14 @@
+<?php
+
+function secsyn_views_menu() {
+  return array(
+    'admin/structure/views/syndicate' => array(
+      'title' => 'Syndicate',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_views_syndicate_form'),
+      'access arguments' => array('syndicate object'),
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'secsyn_views.pages.inc',
+    ),
+  );
+}

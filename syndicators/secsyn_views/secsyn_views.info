@@ -1,0 +1,9 @@
+name = Views Syndication
+description = "Provides an interface for syndicating views"
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn_exportable
+dependencies[] = views
+
+version = "7.x-1.0-dev"
