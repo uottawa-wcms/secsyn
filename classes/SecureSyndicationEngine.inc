@@ -94,6 +94,36 @@ class SecureSyndicationEngine {
     return TRUE;
   }
 
+  private function queueDependencies($remote_server, $dependencies, $urgent = FALSE) {
+    foreach ($dependencies as $dependency) {
+      $dep_profile = SecureSyndicationProfile::getProfile($dependency['profile']);
+      $dep_uuid = $dep_profile->uuid($dependency['object']);
+      if (!$this->queueForValidation($remote_server, $dependency['profile'], $dep_uuid, $urgent)) {
+        $this->log('SSVQ: Could not queue dependency [@uuid] with profile [@profile]', array(
+          '@uuid' => $dep_uuid,
+          '@profile' => $dependency['profile'],
+        ), WATCHDOG_ERROR);
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  private function queueChildren($remote_server, $children, $urgent = FALSE) {
+    foreach ($children as $child) {
+      $profile = SecureSyndicationProfile::getProfile($child['profile']);
+      $uuid = $profile->uuid($child['object']);
+      if (!$this->queueForValidation($remote_server, $child['profile'], $uuid, $urgent)) {
+        $this->log('SSVQ: Could not queue child object [@uuid] with profile [@profile]', array(
+          '@uuid' => $uuid,
+          '@profile' => $dependency['profile'],
+        ), WATCHDOG_ERROR);
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
   public function queueForValidation($remote_server, $synprofile_name, $uuid, $urgent = FALSE) {
     $profile = SecureSyndicationProfile::getProfile($synprofile_name);
     $key = $synprofile_name . '/' . $uuid;
@@ -104,20 +134,15 @@ class SecureSyndicationEngine {
         '@profile' => $synprofile_name,
       ));
       $this->uuids_checked[] = $key;
-      $dependencies = $profile->dependencies($profile->lookup($uuid));
       $this->log('SSVQ: Examining object [@uuid] for dependencies', array(
-        '@uuid' => @uuid,
+        '@uuid' => $uuid,
       ));
-      foreach ($dependencies as $dependency) {
-        $dep_profile = SecureSyndicationProfile::getProfile($dependency['profile']);
-        $dep_uuid = $dep_profile->uuid($dependency['object']);
-        if (!$this->queueForValidation($remote_server, $dependency['profile'], $dep_uuid, $urgent)) {
-          $this->log('SSVQ: Could not queue dependency [@uuid] with profile [@profile]', array(
-            '@uuid' => $dep_uuid,
-            '@profile' => $dependency['profile'],
-          ), WATCHDOG_ERROR);
-          return FALSE;
-        }
+      $syn_object = $profile->lookup($uuid);
+      if (!$this->queueDependencies(
+          $remote_server,
+          $profile->dependencies($syn_object),
+          $urgent)) {
+        return FALSE;
       }
       $data = array(
         'unique_id' => $uuid,
@@ -133,7 +158,13 @@ class SecureSyndicationEngine {
         $this->log('SSVQ: Object [@uuid] queued for verification', array(
           '@uuid' => $uuid,
         ));
-        return TRUE;
+        $this->log('SSVQ: Examining object [@uuid] for children', array(
+          '@uuid' => $uuid,
+        ));
+        return $this->queueChildren(
+            $remote_server,
+            $profile->children($syn_object),
+            $urgent);
       }
       return FALSE;
     }

@@ -28,6 +28,10 @@ abstract class SecureSyndicationProfile {
     return array();
   }
 
+  public function children($object) {
+    return array();
+  }
+
   public abstract function package($object);
 
   public abstract function update($uuid, $fields);
