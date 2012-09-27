@@ -1,0 +1,8 @@
+name = Field Syndication
+description = "Provides an API for syndicating field definitions."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn
+
+files[] = SecureSyndicationFieldProfile.inc

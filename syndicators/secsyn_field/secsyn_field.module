@@ -1,0 +1,7 @@
+<?php
+
+function secsyn_field_secsyn_profiles() {
+  return array(
+    'SecureSyndicationFieldProfile' => t('Field Definition Syndication')
+  );
+}
