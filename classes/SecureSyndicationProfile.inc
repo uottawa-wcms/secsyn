@@ -69,7 +69,7 @@ abstract class SecureSyndicationProfile {
   }
 
   public function countList($filter_params) {
-    return 0;
+    return count($this->filteredList($filter_params));
   }
 
   public function queueAll($remote_server, $filter_params, $urgent = FALSE) {
