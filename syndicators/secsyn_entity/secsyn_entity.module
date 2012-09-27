@@ -2,7 +2,7 @@
 
 function secsyn_entity_secsyn_profiles() {
   return array(
-    'SecureSyndicationEntityProfile' => t('Entity Syndication')
+    'SecureSyndicationEntityProfile' => t('Entities')
   );
 }
 
