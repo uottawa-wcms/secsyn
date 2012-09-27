@@ -8,26 +8,24 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
 
   public function package($object) {
     $schema = $this->getSchema($object->table);
-    $package = get_object_vars($object);
-    unset($package[$schema['export']['primary key']]);
-    return $package;
+    unset($object->{$schema['export']['primary key']});
+    return $object;
   }
 
   public function update($uuid, $fields) {
     $pieces = explode('/', $uuid);
     $existing = $this->lookup($uuid);
-    if (!$existing) {
-      $existing = ctools_export_crud_new($pieces[0], TRUE);
-    }
-    foreach ($fields as $key => $value) {
-      $existing->$key = $fields[$value];
+    if ($existing) {
+      $schema = $this->getSchema($pieces[0]);
+      $fields->{$schema['export']['primary key']} = $existing{$schema['export']['primary key']};
     }
     return ctools_export_crud_save($pieces[0], $fields);
   }
 
   public function lookup($uuid) {
     $pieces = explode('/', $uuid);
-    return ctools_export_crud_load($pieces[0], $pieces[1]);
+    $item = ctools_export_crud_load($pieces[0], $pieces[1]);
+    return $item;
   }
 
   public function uuid($object) {
@@ -39,7 +37,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
     if (empty($object->$uuid_key)) {
       return FALSE;
     }
-    return $object->table . '/' . $uuid_key;
+    return $object->table . '/' . $object->$uuid_key;
   }
 
   private function getSchema($table) {
