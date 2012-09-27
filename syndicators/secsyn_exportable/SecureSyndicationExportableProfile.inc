@@ -17,7 +17,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
     $existing = $this->lookup($uuid);
     if ($existing) {
       $schema = $this->getSchema($pieces[0]);
-      $fields->{$schema['export']['primary key']} = $existing{$schema['export']['primary key']};
+      $fields->{$schema['export']['primary key']} = $existing->{$schema['export']['primary key']};
     }
     return ctools_export_crud_save($pieces[0], $fields);
   }
