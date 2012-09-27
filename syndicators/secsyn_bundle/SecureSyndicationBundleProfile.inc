@@ -4,7 +4,7 @@ class SecureSyndicationBundleProfile extends SecureSyndicationProfile {
 
   public function children($object) {
     $children = array();
-    $instances = field_info_instances($object->entity_type, $object->bundle_key);
+    $instances = field_info_instances($object->entity_type, $object->bundle_name);
     foreach ($instances as $instance) {
       // TODO: Ignore certain fields
       $children[] = array(
@@ -33,13 +33,13 @@ class SecureSyndicationBundleProfile extends SecureSyndicationProfile {
   }
 
   public function uuid($object) {
-    if (empty($object->entity_type) || empty($object->bundle_key)) {
+    if (empty($object->entity_type) || empty($object->bundle_name)) {
       return FALSE;
     }
     if (!bundle_api_support($object->entity_type)) {
       return FALSE;
     }
-    return $object->entity_type . '/' . $object->bundle_key;
+    return $object->entity_type . '/' . $object->bundle_name;
   }
 
 }
