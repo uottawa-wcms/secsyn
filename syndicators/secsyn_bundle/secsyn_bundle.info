@@ -1,0 +1,11 @@
+name = Bundle Syndication
+description = "Provides an API for syndicating bundle definitions."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn
+dependencies[] = bundle_api
+dependencies[] = secsyn_field
+
+files[] = SecureSyndicationBundleProfile.inc
+files[] = SecureSyndicationFieldInstanceProfile.inc
