@@ -5,7 +5,7 @@ class SecureSyndicationFieldProfile extends SecureSyndicationProfile {
   public function dependencies($object) {
     $dependencies = array();
     $dependencies += module_invoke_all('secsyn_field_dependencies', $object);
-    return $dependecies;
+    return $dependencies;
   }
 
   public function package($object) {

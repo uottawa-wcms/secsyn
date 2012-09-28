@@ -13,13 +13,6 @@ function secsyn_entity_entity_info_alter(&$entity_info) {
       'custom settings' => TRUE,
     );
   }
-  // maybe this should go somewhere else, but it's easier to support
-  // if we simply say that the taxonomy_vocabulary uses it's machine_name
-  // as a UUID.
-  if (!empty($entity_info['taxonomy_vocabulary'])) {
-    $entity_info['taxonomy_vocabulary']['uuid'] = TRUE;
-    $entity_info['taxonomy_vocabulary']['entity keys']['uuid'] = 'machine_name';
-  }
 }
 
 function secsyn_entity_secsyn_entity_presave(&$object) {
@@ -122,9 +115,9 @@ function secsyn_entity_secsyn_entity_package_alter(&$package, $entity) {
   switch ($package->entity_type) {
     case 'taxonomy_term':
       $parents = taxonomy_get_parents($entity->tid);
-      $package['parents'] = array();
+      $package->parents = array();
       foreach ($parents as $parent) {
-        $package['parents'][] = $parent->uuid;
+        $package->parents[] = $parent->uuid;
       }
       break;
     case 'user':
@@ -156,8 +149,8 @@ function secsyn_entity_secsyn_entity_dependency($entity) {
       break;
     case 'taxonomy_term':
       $dependencies[] = array(
-        'profile' => 'SecureSyndicationEntityProfile',
-        'object' => reset(entity_uuid_load('taxonomy_vocabulary', array($entity->vocabulary_machine_name))),
+        'profile' => 'SecureSyndicationVocabularyProfile',
+        'object' => taxonomy_vocabulary_machine_name_load($entity->vocabulary_machine_name),
       );
       $parents = taxonomy_get_parents($entity->tid);
       foreach ($parents as $parent) {

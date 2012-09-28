@@ -9,3 +9,4 @@ dependencies[] = entity
 
 files[] = SecureSyndicationEntityProfile.inc
 files[] = SecureSyndicationBaseUserProfile.inc
+files[] = SecureSyndicationVocabularyProfile.inc
