@@ -3,8 +3,9 @@
 class SecureSyndicationFieldProfile extends SecureSyndicationProfile {
 
   public function dependencies($object) {
-    // TODO: Do we need to syndicate SOME dependencies? Maybe?
-    return array();
+    $dependencies = array();
+    $dependencies += module_invoke_all('secsyn_field_dependencies', $object);
+    return $dependecies;
   }
 
   public function package($object) {

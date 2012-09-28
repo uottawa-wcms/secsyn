@@ -5,3 +5,19 @@ function secsyn_field_secsyn_profiles() {
     'SecureSyndicationFieldProfile' => t('Field Definitions')
   );
 }
+
+function secsyn_field_secsyn_field_dependencies($object) {
+  $dep = array();
+  switch ($object['field_name']) {
+    case 'taxonomy_term_reference':
+      if (module_exists('secsyn_entity')) {
+        $vocab = entity_uuid_load('taxonomy_vocabulary', $object['settings']['allowed_values'][0]['vocabulary']);
+        $dep[] = array(
+          'profile' => 'SecureSyndicationEntityProfile',
+          'object' => $vocab,
+        );
+      }
+      break;
+  }
+  return $dep;
+}
