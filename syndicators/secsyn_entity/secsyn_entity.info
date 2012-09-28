@@ -8,3 +8,4 @@ dependencies[] = uuid
 dependencies[] = entity
 
 files[] = SecureSyndicationEntityProfile.inc
+files[] = SecureSyndicationBaseUserProfile.inc

@@ -6,11 +6,14 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
     $dependencies = module_invoke_all('secsyn_entity_dependency', $object);
     $info = entity_get_info($object->entity_type);
     $bundle = NULL;
-    if (isset($info['entity keys']['bundle'])) {
+    if (!empty($info['entity keys']['bundle'])) {
       $bundle = $object->{$info['entity keys']['bundle']};
     }
     $fields = field_info_instances($object->entity_type, $bundle);
-    foreach ($fields as $field_instance) {
+    if ($bundle == NULL) {
+      $fields = $fields[$object->entity_type];
+    }
+    foreach ($fields as $key => $field_instance) {
       $field = field_info_field($field_instance['field_name']);
       $dependencies = array_merge($dependencies,
           module_invoke_all('secsyn_field_dependency', $field, $field_instance, $object));
@@ -41,16 +44,20 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
         unset($package->$field_name);
       }
     }
-    $this->invokeHook('secsyn_entity_package_alter', $package);
+    $this->invokeHook('secsyn_entity_package_alter', $package, $object);
     return $package;
   }
 
-  private function invokeHook($hookname, &$object) {
+  private function invokeHook($hookname, &$object1, $object2 = NULL) {
     $modules = module_implements($hookname);
     foreach ($modules as $module) {
       $method = $module . '_' . $hookname;
       if (function_exists($method)) {
-        $method($object);
+        if (!empty($object2)) {
+          $method($object1, $object2);
+        } else {
+          $method($object1);
+        }
       }
     }
   }
@@ -165,7 +172,11 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
       foreach ($results as $type => $entities) {
         foreach ($entities as $entity) {
           $results = entity_load($type, $entity);
-          $engine->queue($remote_server, 'SecureSyndicationEntityProfile', reset($results));
+          if ($type == 'user') {
+            $engine->queue($remote_server, 'SecureSyndicationBaseUserProfile', reset($results));
+          } else {
+            $engine->queue($remote_server, 'SecureSyndicationEntityProfile', reset($results));
+          }
         }
       }
     }
