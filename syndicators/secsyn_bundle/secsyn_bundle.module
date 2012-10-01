@@ -17,8 +17,6 @@ function secsyn_bundle_secsyn_entity_dependency($entity) {
           'object' => $bundle,
         ),
       );
-    } else {
-      var_dump($bundle);
     }
   }
 }
