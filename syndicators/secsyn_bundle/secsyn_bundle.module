@@ -9,11 +9,16 @@ function secsyn_bundle_secsyn_profiles() {
 function secsyn_bundle_secsyn_entity_dependency($entity) {
   if (bundle_api_support($entity->entity_type)) {
     $bundle_key = bundle_api_get_bundle_key($entity->entity_type, $entity);
-    return array(
-      array(
-        'profile' => 'SecureSyndicationBundleProfile',
-        'object' => bundle_api_get_bundle($entity->entity_type, $bundle_key),
-      ),
-    );
+    $bundle = bundle_api_get_bundle($entity->entity_type, $bundle_key);
+    if (!empty($bundle)) {
+      return array(
+        array(
+          'profile' => 'SecureSyndicationBundleProfile',
+          'object' => $bundle,
+        ),
+      );
+    } else {
+      var_dump($bundle);
+    }
   }
 }

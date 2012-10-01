@@ -28,6 +28,9 @@ class SecureSyndicationBundleProfile extends SecureSyndicationProfile {
   }
 
   public function lookup($uuid) {
+    if (empty($uuid)) {
+      return FALSE;
+    }
     $pieces = explode('/', $uuid);
     return bundle_api_get_bundle($pieces[0], $pieces[1]);
   }
