@@ -2,7 +2,9 @@
 
 function secsyn_entity_secsyn_profiles() {
   return array(
-    'SecureSyndicationEntityProfile' => t('Entities')
+    'SecureSyndicationEntityProfile' => t('Entities'),
+    'SecureSyndicationVocabularyProfile' => t('Taxonomy Vocabularies'),
+    'SecureSyndicationBaseUserProfile' => t('Users (Limited)'),
   );
 }
 
@@ -21,56 +23,6 @@ function secsyn_entity_secsyn_entity_presave(&$object) {
     // TODO: Control revisions with a setting (or let others implement the hook?)
     $object->revision = 1;
   }
-  switch ($object->entity_type) {
-    case 'node':
-      if (!empty($fields->tnid)) {
-        if ($fields->tnid == $fields->{$info['entity keys']['uuid']}) {
-          $object->secsyn_state['selfref_translation'] = TRUE;
-          $object->tnid = 0;
-        }
-      }
-      break;
-    case 'taxonomy_term':
-      if (!empty($fields->parents)) {
-        $object->secsyn_state['parents'] = $fields->parents;
-        unset($fields->parents);
-      }
-      break;
-    case 'user':
-      $profile = SecureSyndicationProfile::getProfile('SecureSyndicationBaseUserProfile');
-      $existing = $profile->lookup($profile->uuid($object));
-      if (empty($existing)) {
-        $object->status = 0;
-        $object->pass = NULL;
-      }
-  }
-}
-
-function secsyn_entity_secsyn_entity_postsave(&$object) {
-  switch ($object->entity_type) {
-    case 'node':
-      if (!empty($object->secsyn_state['selfref_translation'])) {
-        $object->tnid = $object->nid;
-        unset($object->secsyn_state);
-        entity_uuid_save($object->entity_type, $object);
-      }
-      break;
-    case 'taxonomy_term':
-      if (!empty($object->secsyn_state['parents'])) {
-        // rebuild the hierarchy, to match the syndicated version
-        db_delete('taxonomy_term_hierarchy')
-            ->condition('tid', $object->tid)
-            ->execute();
-        foreach ($object->secsyn_state['parents'] as $uuid) {
-          db_insert('taxonomy_term_hierarchy')
-              ->fields(array(
-                'tid' => $object->tid,
-                'parent' => entity_get_id_by_uuid('taxonomy_term', $uuid),
-              ))
-              ->execute();
-        }
-      }
-  }
 }
 
 function secsyn_entity_entity_load($entities, $type) {
@@ -79,87 +31,5 @@ function secsyn_entity_entity_load($entities, $type) {
   }
 }
 
-function secsyn_entity_secsyn_field_dependency($field, $instance, $entity) {
-  $dependencies = array();
-  switch ($field['type']) {
-    case 'entityreference':
-      $entity_type = $field['settings']['target_type'];
-      foreach ($entity->{$instance['field_name']} as $lang => $list) {
-        foreach ($list as $uuid) {
-          $ref = entity_uuid_load($entity_type, array($uuid['target_id']));
-          $ref = reset($term);
-          $dependencies[] = array(
-            'profile' => 'SecureSyndicationEntityProfile',
-            'object' => $ref,
-          );
-        }
-      }
-      break;
-    case 'taxonomy_term_reference':
-      foreach ($entity->{$instance['field_name']} as $lang => $list) {
-        foreach ($list as $uuid) {
-          $term = entity_uuid_load('taxonomy_term', array($uuid['tid']));
-          $term = reset($term);
-          $dependencies[] = array(
-            'profile' => 'SecureSyndicationEntityProfile',
-            'object' => $term,
-          );
-        }
-      }
-      break;
-  }
-  return $dependencies;
-}
-
-function secsyn_entity_secsyn_entity_package_alter(&$package, $entity) {
-  switch ($package->entity_type) {
-    case 'taxonomy_term':
-      $parents = taxonomy_get_parents($entity->tid);
-      $package->parents = array();
-      foreach ($parents as $parent) {
-        $package->parents[] = $parent->uuid;
-      }
-      break;
-    case 'user':
-      unset($entity->pass);
-      unset($entity->status);
-      break;
-  }
-}
-
-function secsyn_entity_secsyn_entity_dependency($entity) {
-  $dependencies = array();
-  switch ($entity->entity_type) {
-    case 'node':
-      if (!empty($entity->tnid)) {
-        if ($entity->tnid != $entity->nid) {
-          $dependencies[] = array(
-            'profile' => 'SecureSyndicationEntityProfile',
-            'object' => reset(entity_uuid_load('node', array($entity->tnid))),
-          );
-        }
-      }
-      // we don't want to syndicate profiles for user 0 or 1, that would be crazy
-      if ($entity->uid > 1) {
-        $dependencies[] = array(
-          'profile' => 'SecureSyndicationEntityProfile',
-          'object' => reset(entity_uuid_load('user', array($entity->uid))),
-        );
-      }
-      break;
-    case 'taxonomy_term':
-      $dependencies[] = array(
-        'profile' => 'SecureSyndicationVocabularyProfile',
-        'object' => taxonomy_vocabulary_machine_name_load($entity->vocabulary_machine_name),
-      );
-      $parents = taxonomy_get_parents($entity->tid);
-      foreach ($parents as $parent) {
-        $dependencies[] = array(
-          'profile' => 'SecureSyndicationEntityProfile',
-          'object' => $parent,
-        );
-      }
-      break;
-  }
-  return $dependencies;
-}
+module_load_include('inc', 'secsyn_entity', 'secsyn_entity.core');
+module_load_include('inc', 'secsyn_entity', 'secsyn_entity.contrib');

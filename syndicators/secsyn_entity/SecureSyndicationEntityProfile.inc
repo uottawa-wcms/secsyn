@@ -21,6 +21,11 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
     return $dependencies;
   }
 
+  public function children($object) {
+    $children = module_invoke_all('secsyn_entity_children', $object);
+    return $children;
+  }
+
   public function package($object) {
     $package = clone $object;
     $info = entity_get_info($object->entity_type);
