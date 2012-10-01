@@ -7,6 +7,8 @@ class SecureSyndicationEngine {
   private $syndication_queue = NULL;
   private $uuids_checked = array();
 
+  private $debug = FALSE;
+
   public function __construct() {}
 
   public function waitingQueueSize() {
@@ -32,10 +34,12 @@ class SecureSyndicationEngine {
 
   private function log($message, $variables = array(), $type = WATCHDOG_DEBUG) {
     watchdog('secsyn', $message, $variables, $type);
-    if ($type == WATCHDOG_DEBUG || $type == WATCHDOG_INFO) {
-      drupal_set_message(t($message, $variables), 'debug');
-    } else {
-      drupal_set_message(t($message, $variables), 'error');
+    if ($this->debug) {
+      if ($type == WATCHDOG_DEBUG || $type == WATCHDOG_INFO) {
+        drupal_set_message(t($message, $variables), 'debug');
+      } else {
+        drupal_set_message(t($message, $variables), 'error');
+      }
     }
   }
 
