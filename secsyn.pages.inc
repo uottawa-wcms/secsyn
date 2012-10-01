@@ -3,7 +3,7 @@
 function secsyn_force_page() {
   module_load_include('inc', 'secsyn', 'secsyn.functions');
   secsyn_syndicate_all(FALSE);
-  return '<p>Syndication complete</p>';
+  return '<p>' . t('Syndication complete') . '</p>';
 }
 
 function secsyn_status_page() {
