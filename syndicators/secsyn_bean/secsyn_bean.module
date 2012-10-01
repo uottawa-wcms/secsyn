@@ -1,0 +1,39 @@
+<?php
+
+function secsyn_bean_entity_info_alter(&$info) {
+  if (empty($info['bean']['bundle_load'])) {
+    $info['bean'] += array(
+      'bundle_load' => 'secsyn_bean_load_bean_type',
+      'bundle_save' => 'secsyn_bean_save_bean_type',
+    );
+  }
+}
+
+function secsyn_bean_load_bean_type($entity_type, $bundle_name) {
+  $type = bean_type_load($bundle_name);
+  return (object) array(
+    'plugin' => $type->getInfo(),
+    'bundle_name' => $bundle_name,
+    'entity_type' => $entity_type,
+  );
+}
+
+function secsyn_bean_save_bean_type($bundle_definition) {
+  $bean = new BeanCustom($bundle_definition->plugin);
+  $existing = !!bean_type_load($bundle_definition->bundle_name);
+  return $bean->save($existing);
+}
+
+function secsyn_bean_menu() {
+  return array(
+    'block/%/syndicate' => array(
+      'title' => 'Syndicate',
+      'description' => 'Syndicate an object to a remote server',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_bean_syndicate_form', 1),
+      'access arguments' => array('syndicate object'),
+      'file' => 'secsyn_bean.pages.inc',
+      'type' => MENU_LOCAL_TASK,
+    ),
+  );
+}
