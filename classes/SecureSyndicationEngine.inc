@@ -32,6 +32,11 @@ class SecureSyndicationEngine {
 
   private function log($message, $variables = array(), $type = WATCHDOG_DEBUG) {
     watchdog('secsyn', $message, $variables, $type);
+    if ($type == WATCHDOG_DEBUG || $type == WATCHDOG_INFO) {
+      drupal_set_message(t($message, $variables), 'debug');
+    } else {
+      drupal_set_message(t($message, $variables), 'error');
+    }
   }
 
   public function queue($remote_server, $synprofile_name, $object, $urgent = FALSE) {
@@ -137,6 +142,10 @@ class SecureSyndicationEngine {
   }
 
   public function queueForValidation($remote_server, $synprofile_name, $uuid, $urgent = FALSE) {
+    if (empty($uuid)) {
+      $this->log('SSVQ: Could not queue object for validation, empty UUID');
+      return FALSE;
+    }
     $profile = SecureSyndicationProfile::getProfile($synprofile_name);
     $key = $synprofile_name . '/' . $uuid;
     if (!in_array($key, $this->uuids_checked)) {
