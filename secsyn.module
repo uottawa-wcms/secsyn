@@ -1,5 +1,32 @@
 <?php
 
+function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = FALSE) {
+  if ($urgent && (!user_access('urgent syndication'))) {
+    $urgent = FALSE;
+  }
+  $engine = new SecureSyndicationEngine();
+  $remote = twoway_server_load($remote_machine_name);
+  return $engine->queue($remote['server_connection'], $profile, $object, $urgent);
+}
+
+function _secsyn_common_fields(&$form) {
+  $form['remote_server'] = array(
+    '#type' => 'select',
+    '#options' => twoway_server_list(),
+    '#title' => t('Remote Server'),
+    '#empty_value' => '',
+    '#default_value' => '',
+    '#empty_option' => t('Select one...'),
+    '#required' => TRUE,
+  );
+  if (user_access('urgent syndication')) {
+    $form['urgency'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Urgent: Push ASAP'),
+    );
+  }
+}
+
 function secsyn_permission() {
   return array(
     'syndicate object' => array(
