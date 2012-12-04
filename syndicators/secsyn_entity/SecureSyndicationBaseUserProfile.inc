@@ -13,6 +13,9 @@
 class SecureSyndicationBaseUserProfile extends SecureSyndicationEntityProfile {
 
   public function lookup($uuid) {
+    if (empty($uuid)) {
+      return FALSE;
+    }
     $pieces = explode('/', $uuid);
     $user = user_load_by_mail($pieces[2]);
     if ($user) {
@@ -23,7 +26,7 @@ class SecureSyndicationBaseUserProfile extends SecureSyndicationEntityProfile {
         if (empty($item)) {
           // there's no item with the UUID already, so let's just
           // give the existing item the correct UUID.
-          db_update('user')
+          db_update('users')
               ->fields(array(
                 'uuid' => $pieces[1]
               ))

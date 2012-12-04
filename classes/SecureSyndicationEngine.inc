@@ -374,9 +374,10 @@ class SecureSyndicationEngine {
     for ($k = 0; $k < $batch_size; $k++) {
       $item = $this->syndication_queue->claimItem(60, $only_urgent ? 1 : 0);
       if (!empty($item)) {
-        $this->log('SSSQ: adding item [@uuid] to batch send for [@remote]', array(
+        $this->log('SSSQ: adding item [@uuid] to batch send for [@remote] using [@profile]', array(
           '@uuid' => $item->data['uuid'],
           '@remote' => $item->data['remote_server'],
+          '@profile' => $item->data['profile'],
         ));
         $items[] = $item;
         if (!isset($batch[$item->data['remote_server']])) {

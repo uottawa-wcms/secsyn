@@ -114,6 +114,7 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
       if (!empty($entity['entity keys']['uuid'])) {
         if (count($entity['bundles']) > 1) {
           $options[$e_key] = $entity['label'] . ' - [all bundles]';
+
           foreach ($entity['bundles'] as $bundle_key => $bundle) {
             $options[$e_key . '/' . $bundle_key] = $entity['label'] . ' - ' . $bundle['label'];
           }
@@ -154,7 +155,7 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
       $results = $efq->execute();
       foreach ($results as $type => $entities) {
         foreach ($entities as $entity_id => $entity) {
-          $object = reset(entity_load($type, $entity));
+          $object = reset(entity_load($type, (array) $entity));
           $uri = entity_uri($type, $object);
           $standard = array(
             'label' => entity_label($type, $object),

@@ -40,6 +40,9 @@ abstract class SecureSyndicationProfile {
 
   public function hash($object, $lookup_fields = NULL) {
     $object = $this->package($object);
+    if (is_array($object)) {
+      $object = (object) $object;
+    }
     if (!empty($lookup_fields)) {
       $props = array_keys(get_object_vars($object));
       foreach ($props as $property) {

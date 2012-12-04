@@ -25,14 +25,16 @@ function node_secsyn_entity_postsave(&$object) {
 function node_secsyn_entity_children($entity) {
   $children = array();
   if ($entity->entity_type == 'node') {
-    $comments = db_query('SELECT uuid FROM {comment} WHERE nid = :nid', array(
-      ':nid' => $entity->nid,
-    ));
-    foreach ($comments as $comment) {
-      $children[] = array(
-        'profile' => 'SecureSyndicationEntityProfile',
-        'object' => reset(entity_uuid_load('comment', array($comment->uuid))),
-      );
+    if (module_exists('comment')) {
+      $comments = db_query('SELECT uuid FROM {comment} WHERE nid = :nid', array(
+        ':nid' => $entity->nid,
+      ));
+      foreach ($comments as $comment) {
+        $children[] = array(
+          'profile' => 'SecureSyndicationEntityProfile',
+          'object' => reset(entity_uuid_load('comment', array($comment->uuid))),
+        );
+      }
     }
   }
   return $children;
@@ -51,10 +53,10 @@ function node_secsyn_entity_dependency($entity) {
     }
     // we don't want to syndicate profiles for user 0 or 1, that would be crazy
     if ($entity->uid > 1) {
-      $dependencies[] = array(
+      /*$dependencies[] = array(
         'profile' => 'SecureSyndicationBaseUserProfile',
         'object' => reset(entity_uuid_load('user', array($entity->uid))),
-      );
+      );*/
     }
   }
   return $dependencies;
@@ -64,10 +66,10 @@ function comment_secsyn_entity_dependency($entity) {
   $dependencies = array();
   if ($entity->entity_type == 'comment') {
     if ($entity->uuid > 1) {
-      $dependencies[] = array(
+      /*$dependencies[] = array(
         'profile' => 'SecureSyndicationBaseUserProfile',
         'object' => reset(entity_uuid_load('user', array($entity->uid))),
-      );
+      );*/
     }
     if (!empty($entity->pid)) {
       $parent = comment_load($entity->pid);
@@ -161,10 +163,12 @@ function user_secsyn_entity_package_alter(&$package, $entity) {
 }
 
 function user_secsyn_entity_presave(&$object) {
-  $profile = SecureSyndicationProfile::getProfile('SecureSyndicationBaseUserProfile');
-  $existing = $profile->lookup($profile->uuid($object));
-  if (empty($existing)) {
-    $object->status = 0;
-    $object->pass = NULL;
+  if ($object->entity_type == 'user') {
+    $profile = SecureSyndicationProfile::getProfile('SecureSyndicationBaseUserProfile');
+    $existing = $profile->lookup($profile->uuid($object));
+    if (empty($existing)) {
+      $object->status = 0;
+      $object->pass = NULL;
+    }
   }
 }

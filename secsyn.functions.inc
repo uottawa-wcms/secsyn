@@ -11,7 +11,7 @@ function secsyn_get_profiles() {
 function secsyn_syndicate_all($from_cron = FALSE) {
   $start_time = time();
   $elapsed_time = 0;
-  $max_time = 15;
+  $max_time = 60;
   $mode = 0;
   $urgent_only = TRUE;
   $hour = date('s') + (date('i') * 60) + (date('G') * 3600);
