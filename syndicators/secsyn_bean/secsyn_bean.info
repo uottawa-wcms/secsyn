@@ -8,3 +8,10 @@ dependencies[] = secsyn_entity
 dependencies[] = bean
 dependencies[] = bean_uuid
 dependencies[] = bean_admin_ui
+
+
+; Information added by drush on 2012-12-13
+version = "unknown"
+project = "secsyn"
+datestamp = "1355423728"
+

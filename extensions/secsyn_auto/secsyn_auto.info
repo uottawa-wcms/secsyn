@@ -6,3 +6,9 @@ package = Secure Syndication
 dependencies[] = secsyn_filters
 
 version = "7.x-1.0-dev"
+
+; Information added by drush on 2012-12-13
+version = "unknown"
+project = "secsyn"
+datestamp = "1355423728"
+

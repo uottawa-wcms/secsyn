@@ -14,3 +14,12 @@ function secsyn_node_menu() {
   );
 }
 
+function secsyn_node_preprocess_node(&$vars) {
+  if (user_access('syndicate object')) {
+    $vars['user_actions']['syndicate'] = array(
+      'title' => t('Syndicate'),
+      'path' => 'node/' . $vars['node']->nid . '/syndicate',
+      'weight' => 50,
+    );
+  }
+}

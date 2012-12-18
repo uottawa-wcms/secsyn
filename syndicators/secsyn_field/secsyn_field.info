@@ -6,3 +6,9 @@ package = Secure Syndication
 dependencies[] = secsyn
 
 files[] = SecureSyndicationFieldProfile.inc
+
+; Information added by drush on 2012-12-13
+version = "unknown"
+project = "secsyn"
+datestamp = "1355423728"
+

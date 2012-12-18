@@ -37,3 +37,15 @@ function secsyn_bean_menu() {
     ),
   );
 }
+
+function secsyn_bean_preprocess_entity(&$vars) {
+  if ($vars['entity_type'] == 'bean') {
+    if (user_access('syndicate object')) {
+      $vars['user_actions']['syndicate'] = array(
+        'title' => t('Syndicate'),
+        'path' => 'block/' . $vars['bean']->delta . '/syndicate',
+        'weight' => 50,
+      );
+    }
+  }
+}
