@@ -12,3 +12,10 @@ version = "unknown"
 project = "secsyn"
 datestamp = "1355423728"
 
+
+
+; Information added by drush on 2013-01-04
+version = "unknown"
+project = "secsyn"
+datestamp = "1357319653"
+
