@@ -1,7 +1,12 @@
 <?php
 
+/**
+ * Implements hook_schema().
+ * @return type
+ */
 function secsyn_filters_schema() {
   return array(
+    // @todo The term profile is ambiguous in this context. Change it.
     'secsyn_filters_profile' => _secsyn_filters_schema_profile(),
     'secsyn_filters_component' => _secsyn_filters_schema_component(),
   );

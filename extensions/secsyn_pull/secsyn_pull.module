@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implements hook_twoway_service().
+ */
 function secsyn_pull_twoway_service() {
   return array(
     'filter_list' => array(
@@ -20,6 +23,9 @@ function secsyn_pull_twoway_service() {
   );
 }
 
+/**
+ * Implements hook_menu().
+ */
 function secsyn_pull_menu() {
   return array(
     'admin/content/syndication/pull' => array(

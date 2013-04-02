@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implements hook_menu().
+ */
 function secsyn_filters_menu() {
   return array(
     'admin/content/syndication/filters' => array(
@@ -37,21 +40,58 @@ function secsyn_filters_menu() {
   );
 }
 
+/**
+ * Wrapper function that queues all items that match a filter to a filter profile.
+ *
+ * @todo The use of profile here is confusing, fix it.
+ *
+ * @param string $remote_server A machine name or URL for a remote server
+ * @param stdClass $profile A syndication filter profile. CAUTION: DO NOT
+ *   CONFUSE WITH A SYNDICATION PROFILE.
+ * @param boolean $urgent TRUE to syndicate urgently.
+ * @return boolean The results of the syndication queue.
+ */
 function secsyn_filters_queue_all($remote_server, $profile, $urgent = FALSE) {
   $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
   return $sync_profile->queueAll($remote_server, secsyn_filters_build_options($profile), $urgent);
 }
 
+/**
+ * Wrapper function that counts the number of items that match a filter profile.
+ *
+ * @todo The use of profile here is confusing, fix it.
+ *
+ * @param stdClass $profile A syndication filter profile. CAUTION: DO NOT
+ *   CONFUSE WITH A SYNDICATION PROFILE.
+ * @return int The number of items that match the filter set.
+ */
 function secsyn_filters_count_content($profile) {
   $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
   return $sync_profile->countList(secsyn_filters_build_options($profile));
 }
 
+/**
+ * Wrapper function that retrieves the items that match a filter profile.
+ *
+ * @todo The use of profile here is confusing, fix it.
+ *
+ * @param stdClass $profile A syndication filter profile. CAUTION: DO NOT
+ *   CONFUSE WITH A SYNDICATION PROFILE.
+ * @return array An array of items that match the filter profile.
+ */
 function secsyn_filters_get_content($profile) {
   $sync_profile = SecureSyndicationProfile::getProfile($profile->sync_profile_name);
   return $sync_profile->filteredList(secsyn_filters_build_options($profile));
 }
 
+/**
+ * Creates a list of options to be passed to the syndication profile's
+ * methods.
+ *
+ * @param stdClass $profile A syndication filter profile. CAUTION: DO NOT
+ *   CONFUSE WITH A SYNDICATION PROFILE.
+ * @return array An array of filter settings for syndication profiles to use.
+ */
 function secsyn_filters_build_options($profile) {
   $filter_options = array(
     'mode' => $profile->mode, // mode is currently not used but included to be forwards-compatible
@@ -66,6 +106,9 @@ function secsyn_filters_build_options($profile) {
   return $filter_options;
 }
 
+/**
+ * Implements hook_load for a syndication filter profile.
+ */
 function secsyn_filters_profile_load($profile_key) {
   $rs = db_query("
     SELECT *
@@ -82,6 +125,9 @@ function secsyn_filters_profile_load($profile_key) {
   return FALSE;
 }
 
+/**
+ * Implements hook_load for a syndication filter component.
+ */
 function secsyn_filters_components_load(&$profile) {
   $rs = db_query("
     SELECT *
@@ -99,6 +145,9 @@ function secsyn_filters_components_load(&$profile) {
   }
 }
 
+/**
+ * Saves a syndication profile and it's components.
+ */
 function secsyn_filters_profile_save($profile) {
   $components = array();
   if (property_exists($profile, 'components')) {
@@ -127,6 +176,12 @@ function secsyn_filters_profile_save($profile) {
   }
 }
 
+/**
+ * Checks to see if a filter exists with the machine name.
+ *
+ * @param string $name The machine name to check
+ * @return boolean TRUE if it exists otherwise FALSE.
+ */
 function _secsyn_filters_profile_machine_name_check($name) {
   if (secsyn_filters_profile_load($name)) {
     return TRUE;

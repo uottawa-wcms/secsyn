@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Page callback to get a list of filters.
+ */
 function secsyn_filters_filter_list() {
   $rows = array();
   $headers = array(
@@ -27,6 +30,9 @@ function secsyn_filters_filter_list() {
   ));
 }
 
+/**
+ * Form callback to add or edit a filter profile.
+ */
 function secsyn_filters_filter_form($form, &$form_state, $profile = NULL) {
   module_load_include('inc', 'secsyn', 'secsyn.functions');
   if (empty($profile)) {
@@ -178,6 +184,10 @@ function secsyn_filters_filter_form($form, &$form_state, $profile = NULL) {
   );
   return $form;
 }
+
+/**
+ * Validation callback for secsyn_filters_filter_form().
+ */
 function secsyn_filters_filter_form_validate($form, &$form_state) {
   if ($form_state['values']['op'] == 'Save Filter') {
     if (empty($form_state['values']['title'])) {
@@ -201,6 +211,9 @@ function secsyn_filters_filter_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Submit callback for removing a filter.
+ */
 function secsyn_filters_remove_filter($form, &$form_state) {
   $parents = $form_state['triggering_element']['#parents'];
   $rule_name = $parents[count($parents) - 2];
@@ -212,6 +225,9 @@ function secsyn_filters_remove_filter($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
+/**
+ * Builds the form for existing filter components for a filter profile
+ */
 function secsyn_filters_existing_filters($form, &$form_state, $profile) {
   $profile_rules = array();
   if (!empty($profile->sync_profile_name)) {
@@ -240,10 +256,16 @@ function secsyn_filters_existing_filters($form, &$form_state, $profile) {
   return $profile_rules;
 }
 
+/**
+ * Form callback for AJAX updates
+ */
 function secsyn_filters_filter_form_update($form, &$form_state) {
   return $form['secsyn_filters_block'];
 }
 
+/**
+ * Form callback to create a new filter control.
+ */
 function secsyn_filters_new_filter_control($profile_name) {
   if (empty($profile_name)) {
     return array(

@@ -4,12 +4,3 @@ core = 7.x
 package = Secure Syndication
 
 dependencies[] = secsyn
-
-version = "7.x-1.0-dev"
-
-
-; Information added by drush on 2013-03-21
-version = "unknown"
-project = "secsyn"
-datestamp = "1363875956"
-
