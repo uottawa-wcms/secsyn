@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Provides a small function that is always available to quickly add an object
+ * to the syndication queue.
+ *
+ * @param string $remote_machine_name The machine name of a remote server OR
+ *   the base URL of a server.
+ * @param string $profile The name of the profile to queue with
+ * @param mixed $object The object to queue for syndication
+ * @param boolean $urgent TRUE to use urgent syndication, otherwise FALSE
+ * @return boolean TRUE if the object was queued, otherwise FALSE.
+ */
 function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = FALSE) {
   if ($urgent && (!user_access('urgent syndication'))) {
     $urgent = FALSE;
@@ -9,7 +20,19 @@ function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = F
   return $engine->queue($remote['server_connection'], $profile, $object, $urgent);
 }
 
+/**
+ * Other modules can use this to add the remote server list and common
+ * syndication settings to a form.
+ *
+ * @param array $form FAPI array
+ */
 function _secsyn_common_fields(&$form) {
+  $form['syndication'] = array(
+    '#weight' => 100,
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#title' => t('Syndication Settings'),
+  );
   $form['remote_server'] = array(
     '#type' => 'select',
     '#options' => twoway_server_list(),
@@ -25,8 +48,12 @@ function _secsyn_common_fields(&$form) {
       '#title' => t('Urgent: Push ASAP'),
     );
   }
+  // @todo: hook for other modules to add to this form.
 }
 
+/**
+ * Implements hook_permission().
+ */
 function secsyn_permission() {
   return array(
     'syndicate object' => array(
@@ -48,11 +75,21 @@ function secsyn_permission() {
       'description' => t('Users will be able to trigger urgent syndications'),
       'restrict access' => TRUE,
     ),
+    'receive syndication' => array(
+      'title' => t('Accept syndication'),
+      'description' => t('Users will be able to use the service for syndication'),
+      'restrict access' => TRUE,
+    )
   );
 }
 
+/**
+ * Implements hook_menu().
+ */
 function secsyn_menu() {
   return array(
+    // @todo Consider better naming and location for these files
+    // (possibly under admin/config?)
     'admin/content/syndication' => array(
       'title' => 'Syndication Command Centre',
       'description' => 'List of all the items on the syndication queue',
@@ -82,12 +119,21 @@ function secsyn_menu() {
   );
 }
 
+/**
+ * Implements hook_cron().
+ */
 function secsyn_cron() {
+  // @todo configurable delay setting on how often syndication should run
+  // we fire our own pre-cron event in order to let modules act immediately
+  // before we syndicate from cron.
   module_invoke_all('secsyn_precron');
   module_load_include('inc', 'secsyn', 'secsyn.functions');
   secsyn_syndicate_all(TRUE);
 }
 
+/**
+ * Implements hook_twoway_service().
+ */
 function secsyn_twoway_service() {
   return array(
     'check' => array(

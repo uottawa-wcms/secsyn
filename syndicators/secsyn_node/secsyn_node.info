@@ -6,3 +6,10 @@ package = Secure Syndication
 dependencies[] = secsyn_entity
 
 version = "7.x-1.0-alpha1"
+
+
+; Information added by drush on 2013-03-21
+version = "unknown"
+project = "secsyn"
+datestamp = "1363875956"
+

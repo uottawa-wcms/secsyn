@@ -8,5 +8,3 @@ dependencies[] = twoway
 
 files[] = classes/SecureSyndicationProfile.inc
 files[] = classes/SecureSyndicationEngine.inc
-
-version = "7.x-1.0-dev"

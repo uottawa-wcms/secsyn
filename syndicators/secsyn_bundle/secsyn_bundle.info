@@ -9,3 +9,10 @@ dependencies[] = secsyn_field
 
 files[] = SecureSyndicationBundleProfile.inc
 files[] = SecureSyndicationFieldInstanceProfile.inc
+
+
+; Information added by drush on 2013-03-21
+version = "unknown"
+project = "secsyn"
+datestamp = "1363875956"
+

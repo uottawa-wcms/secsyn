@@ -10,3 +10,10 @@ dependencies[] = entity
 files[] = SecureSyndicationEntityProfile.inc
 files[] = SecureSyndicationBaseUserProfile.inc
 files[] = SecureSyndicationVocabularyProfile.inc
+
+
+; Information added by drush on 2013-03-21
+version = "unknown"
+project = "secsyn"
+datestamp = "1363875956"
+

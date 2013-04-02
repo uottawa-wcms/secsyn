@@ -7,3 +7,10 @@ dependencies[] = secsyn
 dependencies[] = ctools
 
 files[] = SecureSyndicationExportableProfile.inc
+
+
+; Information added by drush on 2013-03-21
+version = "unknown"
+project = "secsyn"
+datestamp = "1363875956"
+
