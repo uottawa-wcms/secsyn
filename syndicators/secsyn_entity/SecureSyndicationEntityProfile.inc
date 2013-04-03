@@ -68,24 +68,61 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
   }
 
   public function update($uuid, $fields) {
+    $fields = (object) $fields;
     $uuid = $this->splitUUID($uuid);
     $info = entity_get_info($uuid['entity_type']);
     $fields->entity_type = $uuid['entity_type'];
-    $uuid_field = $info['entity keys']['uuid'];
+    if (!$uuid['custom']) {
+      $uuid_field = $info['entity keys']['uuid'];
+    } else {
+      $uuid_field = $info['entity keys']['custom uuid'];
+    }
     $fields->$uuid_field = $uuid['uuid'];
-    $object->secsyn_state = array();
+    $fields->secsyn_state = array();
     $this->invokeHook('secsyn_entity_presave', $fields);
-    $state = $object->secsyn_state;
-    unset($object->secsyn_state);
-    entity_uuid_save($uuid['entity_type'], $fields);
-    $object->secsyn_state = $state;
+    $state = $fields->secsyn_state;
+    unset($fields->secsyn_state);
+    if ($uuid['custom']) {
+      $older = $this->loadByCustomUUID($uuid);
+      if (!empty($older)) {
+        $key = $info['entity keys']['id'];
+        $fields->$key = $older->$key;
+      }
+      entity_save($uuid['entity_type'], $fields);
+    } else {
+      entity_uuid_save($uuid['entity_type'], $fields);
+    }
+    $fields->secsyn_state = $state;
     $this->invokeHook('secsyn_entity_postsave', $fields);
     return TRUE;
   }
 
   public function lookup($uuid) {
     $uuid = $this->splitUUID($uuid);
+    if ($uuid['custom']) {
+      return $this->loadByCustomUUID($uuid);
+    }
     return reset(entity_uuid_load($uuid['entity_type'], array($uuid['uuid'])));
+  }
+
+  private function loadByCustomUUID($uuid) {
+    $info = entity_get_info($uuid['entity_type']);
+    if (isset($info['entity keys']['custom uuid'])) {
+      if (isset($info['custom uuid callback'])) {
+        $function = $info['custom uuid callback'];
+        return $function($uuid['uuid']);
+      } else {
+        $efq = new EntityFieldQuery();
+        $efq->entityCondition('entity_type', $uuid['entity_type']);
+        $efq->propertyCondition($info['entity keys']['custom uuid'], $uuid['uuid']);
+        $rs = $efq->execute();
+        if (!empty($rs[$uuid['entity_type']])) {
+          $ids = array_keys($rs[$uuid['entity_type']]);
+          return reset(entity_load($uuid['entity_type'], $ids));
+        }
+      }
+    }
+    return FALSE;
   }
 
   public function uuid($object) {
@@ -93,17 +130,36 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
     // other side.
     $info = entity_get_info($object->entity_type);
     if (!isset($info['entity keys']['uuid'])) {
-      return FALSE;
+      if (!isset($info['entity keys']['custom uuid'])) {
+        return FALSE;
+      }
     }
-    $uuid_property = $info['entity keys']['uuid'];
+    $custom = 0;
+    if (isset($info['entity keys']['uuid'])) {
+      $uuid_property = $info['entity keys']['uuid'];
+    } else {
+      $custom = 1;
+      $uuid_property = $info['entity keys']['custom uuid'];
+    }
+    if ($custom) {
+      return $object->entity_type . '/' . $custom . '/' . $object->$uuid_property;
+    }
     return $object->entity_type . '/' . $object->$uuid_property;
   }
 
   private function splitUUID($uuid) {
-    $pieces = explode('/', $uuid, 2);
+    $pieces = explode('/', $uuid, 3);
+    if ($pieces[1] == '1') {
+      return array(
+        'entity_type' => $pieces[0],
+        'custom' => TRUE,
+        'uuid' => $pieces[2],
+      );
+    }
     return array(
       'entity_type' => $pieces[0],
-      'uuid' => $pieces[1],
+      'custom' => FALSE,
+      'uuid' => $pieces[1] . (isset($pieces[2]) ? '/' . $pieces[2] : ''),
     );
   }
 

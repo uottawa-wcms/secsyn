@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Retrieves a list of all of the profiles available
+ *
+ * @return array An array of profiles.
+ */
 function secsyn_get_profiles() {
   $profiles = &drupal_static(__FUNCTION__);
   if (empty($profiles)) {
@@ -8,13 +13,19 @@ function secsyn_get_profiles() {
   return $profiles;
 }
 
-function secsyn_syndicate_all($from_cron = FALSE) {
+/**
+ * Runs the syndication process
+ */
+function secsyn_syndicate_all() {
   $start_time = time();
   $elapsed_time = 0;
+  // @todo make this setting configurable
   $max_time = 60;
   $mode = 0;
+  // @todo make this setting configurable
   $urgent_only = TRUE;
   $hour = date('s') + (date('i') * 60) + (date('G') * 3600);
+  // @todo make these settings configurable
   $syndication_blackout_start = 0;
   $syndication_blackout_end = 0;
   // if we're outside of the blackout period, syndicate only essential things
@@ -26,6 +37,7 @@ function secsyn_syndicate_all($from_cron = FALSE) {
     // if they are equal, there is no blackout period
     $urgent_only = FALSE;
   }
+  // @todo should we make sure each of these run for a given amount of time?
   $modes = array(
     'checkQueue',
     'checkNextBatch',

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implements hook_schema().
+ */
 function secsyn_auto_schema() {
   return array(
     'secsyn_auto_config' => _secsyn_auto_schema_config(),

@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Auto Syndicator:
- * - list of profiles that participate
- * - filter settings for each profile
+ * Implements hook_menu().
  */
 
 function secsyn_auto_menu() {
@@ -43,6 +41,9 @@ function secsyn_auto_menu() {
   );
 }
 
+/**
+ * Implements hook_secsyn_precron().
+ */
 function secsyn_auto_secsyn_precron() {
   $list = db_query('
     SELECT *
@@ -54,6 +55,9 @@ function secsyn_auto_secsyn_precron() {
   }
 }
 
+/**
+ * Implements hook_load for 'secsyn_auto'.
+ */
 function secsyn_auto_load($machine_name) {
   $rs = db_query('
     SELECT *
@@ -64,21 +68,24 @@ function secsyn_auto_load($machine_name) {
   ));
   if ($rs->rowCount() > 0) {
     $object = $rs->fetchObject();
+    // only people with access to urgent syndication can see those
+    // syndicators
     if ($object->urgent == 'Y') {
       if (!user_access('urgent syndication')) {
         return FALSE;
       }
     }
     return $object;
-  } else {
-    return FALSE;
   }
+  return FALSE;
 }
 
+/**
+ * Checks to see if the machine name already exists for a syndicator.
+ *
+ * @param string $machine_name The machine name to check
+ * @return boolean TRUE if it exists, otherwise FALSE
+ */
 function _secsyn_auto_syndicator_name_check($machine_name) {
-  if (secsyn_auto_load($machine_name)) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
+  return !!secsyn_auto_load($machine_name);
 }

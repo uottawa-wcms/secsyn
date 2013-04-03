@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Summary page callback.
+ *
+ * @return FAPI array.
+ */
 function secsyn_auto_summary_page() {
   $header = array(
     'title' => t('Title'),
@@ -46,6 +51,9 @@ function secsyn_auto_summary_page() {
   ));
 }
 
+/**
+ * Submit callback for secsyn_auto_syndicator_form().
+ */
 function secsyn_auto_syndicator_form_submit($form, &$form_state) {
   $syndicator = array(
     'title' => $form_state['values']['title'],
@@ -64,6 +72,9 @@ function secsyn_auto_syndicator_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/content/syndication/auto';
 }
 
+/**
+ * Form callback for creating / editing an autosyndicator.
+ */
 function secsyn_auto_syndicator_form($form, &$form_state, $autosyn = NULL) {
   $form = array();
   if (empty($autosyn)) {
@@ -152,6 +163,9 @@ function secsyn_auto_syndicator_form($form, &$form_state, $autosyn = NULL) {
   return $form;
 }
 
+/**
+ * Form callback for deleting an autosyndicator().
+ */
 function secsyn_auto_delete_syndicator_form($form, &$form_state, $autosync) {
   $form['autosync'] = array(
     '#type' => 'value',
@@ -165,6 +179,9 @@ function secsyn_auto_delete_syndicator_form($form, &$form_state, $autosync) {
   );
 }
 
+/**
+ * Form submit callback for secsyn_auto_delete_syndicator_form().
+ */
 function secsyn_auto_delete_syndicator_form_submit($form, &$form_state) {
   $mach = $form_state['values']['autosync'];
   db_delete('secsyn_auto_config')
