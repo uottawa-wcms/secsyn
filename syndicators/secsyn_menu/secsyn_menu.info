@@ -1,0 +1,10 @@
+name = Menu Syndication
+description = "Provides an API for syndicating menu."
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn
+dependencies[] = menu_uuid
+
+files[] = SecureSyndicationMenuProfile.inc
+files[] = SecureSyndicationMenuLinkProfile.inc
