@@ -6,6 +6,10 @@ function secsyn_menu_syndicate_form($form, &$form_state, $menu) {
     '#type' => 'value',
   );
   _secsyn_common_fields($form);
+  $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Syndicate'),
+  );
   return $form;
 }
 

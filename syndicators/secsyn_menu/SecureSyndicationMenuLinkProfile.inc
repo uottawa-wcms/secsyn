@@ -45,18 +45,18 @@ class SecureSyndicationMenuLinkProfile extends SecureSyndicationProfile {
     }
     if (!empty($fields['parent_uuid'])) {
       $parent = $this->lookup($fields['parent_uuid']);
-      $fields['plid'] = $parent->mlid;
+      $fields['plid'] = $parent['mlid'];
       unset($fields['parent_uuid']);
     }
     return menu_link_save($fields, $old_item);
   }
   
   public function lookup($uuid) {
-    return menu_uuid_load($uuid);
+    return menu_link_uuid_load($uuid);
   }
   
   public function uuid($object) {
-    return $object->uuid;
+    return $object['uuid'];
   }
   
 }

@@ -1,7 +1,20 @@
 <?php
 
 function secsyn_menu_secsyn_entity_dependency($entity) {
-  
+  $dep = array();
+  $path = entity_uri($entity->entity_type, $entity);
+  $mlid = db_select('menu_links', 'ml')
+          ->fields('ml', array('mlid'))
+          ->condition('link_path', $path)
+          ->execute()
+          ->fetchField();
+  if (!empty($mlid)) {
+    $dep[] = array(
+        'profile' => 'SecureSyndicationMenuLinkProfile',
+        'object' => menu_link_load($mlid)
+    );
+  }
+  return $dep;
 }
 
 function secsyn_menu_secsyn_profiles() {

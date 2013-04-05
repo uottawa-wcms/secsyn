@@ -6,12 +6,13 @@ class SecureSyndicationMenuProfile extends SecureSyndicationProfile {
     $links = menu_load_links($object['menu_name']);
     $children = array();
     foreach ($links as $link) {
-      $link = menu_link_load($object['mlid']);
+      $link = menu_link_load($link['mlid']);
       $children[] = array(
           'profile' => 'SecureSyndicationMenuLinkProfile',
           'object' => $link,
       );
     }
+    return $children;
   }
   
   public function package($object) {
@@ -28,7 +29,7 @@ class SecureSyndicationMenuProfile extends SecureSyndicationProfile {
   }
   
   public function uuid($object) {
-    return $object->menu_name;
+    return $object['menu_name'];
   }
   
 }
