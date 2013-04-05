@@ -273,7 +273,7 @@ class SecureSyndicationEngine {
       if (!$this->queueForValidation($remote_server, $child['profile'], $uuid, $urgent)) {
         $this->log('Could not queue child object [@uuid] with profile [@profile]', array(
           '@uuid' => $uuid,
-          '@profile' => $dependency['profile'],
+          '@profile' => $child['profile'],
         ), WATCHDOG_ERROR);
         return FALSE;
       }

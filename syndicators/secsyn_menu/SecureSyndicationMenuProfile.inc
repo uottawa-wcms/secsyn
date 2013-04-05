@@ -12,6 +12,8 @@ class SecureSyndicationMenuProfile extends SecureSyndicationProfile {
           'object' => $link,
       );
     }
+    watchdog('test', var_Export($links, TRUE));
+    watchdog('test', var_export($children, TRUE));
     return $children;
   }
   

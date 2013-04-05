@@ -5,12 +5,15 @@ class SecureSyndicationMenuLinkProfile extends SecureSyndicationProfile {
   public function dependencies($object) {
     $deps = array();
     $menu = menu_load($object['menu_name']);
+    watchdog('test2', 'parent menu name:' . var_export($object, TRUE));
+      watchdog('test', 'parent menu: ' . var_export($menu, TRUE));
     $deps[] = array(
       'object' => $menu,
       'profile' => 'SecureSyndicationMenuProfile',
     );
     if (!empty($object['plid'])) {
       $parent_link = menu_link_load($object['plid']);
+      watchdog('test', 'parent_link: ' . var_export($parent_link, TRUE));
       $deps[] = array(
           'object' => $parent_link,
           'profile' => 'SecureSyndicationMenuLinkProfile',
@@ -20,7 +23,7 @@ class SecureSyndicationMenuLinkProfile extends SecureSyndicationProfile {
   }
   
   public function package($object) {
-    $package = clone $object;
+    $package = array_merge(array(), (array) $object);
     unset($package['mlid']);
     if (!empty($package['plid'])) {
       $parent_link = menu_link_load($object['plid']);
