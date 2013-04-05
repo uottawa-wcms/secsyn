@@ -5,7 +5,7 @@ function secsyn_menu_secsyn_entity_dependency($entity) {
   $path = entity_uri($entity->entity_type, $entity);
   $mlid = db_select('menu_links', 'ml')
           ->fields('ml', array('mlid'))
-          ->condition('link_path', $path)
+          ->condition('link_path', $path['path'])
           ->execute()
           ->fetchField();
   if (!empty($mlid)) {
