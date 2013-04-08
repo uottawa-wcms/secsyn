@@ -1,0 +1,39 @@
+<?php
+
+function secsyn_menu_secsyn_entity_dependency($entity) {
+  $dep = array();
+  $path = entity_uri($entity->entity_type, $entity);
+  $mlid = db_select('menu_links', 'ml')
+          ->fields('ml', array('mlid'))
+          ->condition('link_path', $path['path'])
+          ->execute()
+          ->fetchField();
+  if (!empty($mlid)) {
+    $dep[] = array(
+        'profile' => 'SecureSyndicationMenuLinkProfile',
+        'object' => menu_link_load($mlid)
+    );
+  }
+  return $dep;
+}
+
+function secsyn_menu_secsyn_profiles() {
+  return array(
+    'SecureSyndicationMenuProfile' => t('Menus'),
+    'SecureSyndicationMenuLinkProfile' => t('Menu Links'),
+  );
+}
+
+function secsyn_menu_menu() {
+  return array(
+      'admin/structure/menu/manage/%menu/syndicate' => array(
+          'title' => 'Syndicate',
+          'type' => MENU_LOCAL_TASK,
+          'page callback' => 'drupal_get_form',
+          'page arguments' => array('secsyn_menu_syndicate_form', 4),
+          'file' => 'secsyn_menu.pages.inc',
+          'access arguments' => array('syndicate object'),
+      ),
+  );
+}
+

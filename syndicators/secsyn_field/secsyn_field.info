@@ -8,8 +8,8 @@ dependencies[] = secsyn
 files[] = SecureSyndicationFieldProfile.inc
 
 
-; Information added by drush on 2013-03-21
+; Information added by drush on 2013-04-05
 version = "unknown"
 project = "secsyn"
-datestamp = "1363875956"
+datestamp = "1365172768"
 

@@ -33,12 +33,11 @@ function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = F
  */
 function _secsyn_common_fields(&$form) {
   $form['syndication'] = array(
-    '#weight' => 100,
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#title' => t('Syndication Settings'),
   );
-  $form['remote_server'] = array(
+  $form['syndication']['remote_server'] = array(
     '#type' => 'select',
     '#options' => twoway_server_list(),
     '#title' => t('Remote Server'),
@@ -48,7 +47,7 @@ function _secsyn_common_fields(&$form) {
     '#required' => TRUE,
   );
   if (user_access('urgent syndication')) {
-    $form['urgency'] = array(
+    $form['syndication']['urgency'] = array(
       '#type' => 'checkbox',
       '#title' => t('Urgent: Push ASAP'),
     );
