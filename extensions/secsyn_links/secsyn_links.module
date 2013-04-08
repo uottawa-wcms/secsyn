@@ -61,7 +61,9 @@ function secsyn_links_find_link($server, $object, $profile) {
       ->condition('profile_name', $profile)
       ->execute()
       ->fetch();
-  $row->options = unserialize($row->options);
+  if (!empty($row)) {
+    $row->options = unserialize($row->options);
+  }
   return $row;
 }
 

@@ -1,0 +1,14 @@
+<?php
+
+function secsyn_pages_menu() {
+  return array(
+    'admin/structure/pages/syndicate' => array(
+      'title' => 'Syndicate',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_pages_syndicate_form'),
+      'access arguments' => array('syndicate object'),
+      'type' => MENU_LOCAL_TASK,
+      'file' => 'secsyn_pages.pages.inc',
+    ),
+  );
+}

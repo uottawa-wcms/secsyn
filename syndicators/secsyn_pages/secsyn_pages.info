@@ -1,0 +1,6 @@
+name = Pages Syndication
+description = "Adds UI elements for syndicating pages (from page manager)"
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn_exportable

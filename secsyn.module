@@ -53,6 +53,7 @@ function _secsyn_common_fields(&$form, $object, $profile) {
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#title' => t('Syndication Settings'),
+    '#tree' => TRUE,
   );
   $servers = variable_get('secsyn_links_servers', array());
   $modules = module_implements('secsyn_common_fields');
