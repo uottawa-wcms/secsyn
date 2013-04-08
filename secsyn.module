@@ -17,7 +17,12 @@ function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = F
   }
   $engine = new SecureSyndicationEngine();
   $remote = twoway_server_load($remote_machine_name);
-  return $engine->queue($remote['server_connection'], $profile, $object, $urgent);
+  if (empty($remote)) {
+    $remote = $remote_machine_name;
+  } else {
+    $remote = $remote['server_connection'];
+  }
+  return $engine->queue($remote, $profile, $object, $urgent);
 }
 
 /**

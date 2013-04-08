@@ -3,6 +3,7 @@
 class SecureSyndicationBundleProfile extends SecureSyndicationProfile {
 
   public function children($object) {
+    $object = (object) $object;
     $children = array();
     $instances = field_info_instances($object->entity_type, $object->bundle_name);
     foreach ($instances as $instance) {
@@ -36,6 +37,7 @@ class SecureSyndicationBundleProfile extends SecureSyndicationProfile {
   }
 
   public function uuid($object) {
+    $object = (object) $object;
     if (empty($object->entity_type) || empty($object->bundle_name)) {
       return FALSE;
     }

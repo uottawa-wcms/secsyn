@@ -25,9 +25,9 @@ function secsyn_entity_secsyn_entity_presave(&$object) {
   }
 }
 
-function secsyn_entity_entity_load($entities, $type) {
-  foreach ($entities as $entity) {
-    $entity->entity_type = $type;
+function secsyn_entity_entity_load(&$entities, $type) {
+  foreach ($entities as $key => $entity) {
+    $entities[$key]->entity_type = $type;
   }
 }
 
