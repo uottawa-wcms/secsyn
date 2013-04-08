@@ -26,33 +26,108 @@ function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = F
 }
 
 /**
+ *
+ */
+function _secsyn_common_fields_submit($profile, &$object, &$form_state) {
+  foreach ($form_state['values']['syndication'] as $server_machine_name => $syndication_settings) {
+    if ($syndication_settings['syndicate']) {
+      _secsyn_fast_queue($server_machine_name, $profile, $object, $syndication_settings['urgent']);
+    }
+    $modules = module_implements('secsyn_common_fields_submit');
+    foreach ($modules as $module) {
+      $hook = $module . '_secsyn_common_fields_submit';
+      $hook($profile, $object, $server_machine_name, $syndication_settings);
+    }
+  }
+}
+
+
+/**
  * Other modules can use this to add the remote server list and common
  * syndication settings to a form.
  *
  * @param array $form FAPI array
  */
-function _secsyn_common_fields(&$form) {
+function _secsyn_common_fields(&$form, $object, $profile) {
   $form['syndication'] = array(
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#title' => t('Syndication Settings'),
   );
-  $form['syndication']['remote_server'] = array(
-    '#type' => 'select',
-    '#options' => twoway_server_list(),
-    '#title' => t('Remote Server'),
-    '#empty_value' => '',
-    '#default_value' => '',
-    '#empty_option' => t('Select one...'),
-    '#required' => TRUE,
-  );
-  if (user_access('urgent syndication')) {
-    $form['syndication']['urgency'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Urgent: Push ASAP'),
+  $servers = variable_get('secsyn_links_servers', array());
+  $modules = module_implements('secsyn_common_fields');
+  $first = TRUE;
+  foreach ($servers as $server_name) {
+    $server = twoway_server_load($server_name);
+    $subform = array();
+    $subform['markup'] = array(
+      '#markup' => '<tr><td>' . $server['server_display'] . '</td>'
     );
+    if ($first) {
+      $subform['markup']['#prefix'] = '<table><tr>'._secsyn_common_fields_header().'</tr>';
+    }
+    $subform['syndicate'] = array(
+      '#type' => 'checkbox',
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+    );
+    if (user_access('urgent syndication')) {
+      $subform['urgent'] = array(
+        '#type' => 'checkbox',
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+      );
+    } else {
+      $subform['urgent'] = array(
+        '#type' => 'value',
+        '#value' => FALSE,
+      );
+    }
+    foreach ($modules as $module) {
+      $hook = $module . '_secsyn_common_fields';
+      $hook($subform, $profile, $object, $server_name);
+    }
+    $form['syndication'][$server_name] = $subform;
   }
-  // @todo: hook for other modules to add to this form.
+  $form['syndication']['finish'] = array('#markup' => '</table>');
+
+}
+
+
+function _secsyn_common_fields_header() {
+  $header = array(
+    'Server Name' => '*',
+    'Syndicate' => '50px',
+    'Urgent' => '50px',
+  );
+  drupal_alter('secsyn_common_fields_header', $header);
+  $str = '';
+  foreach ($header as $name => $width) {
+    $str .= '<th';
+    if ($width != '*') {
+      $str .= ' style="width: ' . $width . ';"';
+    }
+    $str .= '>' . t($name) . '</th>';
+  }
+  return $str;
+}
+
+function _secsyn_validate_options($form, &$form_state) {
+  $modules = module_implements('secsyn_common_fields_validate');
+  foreach ($modules as $module) {
+    $hook = $module . '_secsyn_common_fields_validate';
+    $hook($form, $form_state);
+  }
+}
+
+function _secsyn_build_options($form, &$form_state) {
+  $modules = module_implements('secsyn_common_fields_values');
+  $options = array();
+  foreach ($modules as $module) {
+    $hook = $module . '_secsyn_common_fields_values';
+    $hook($options, $form, $form_state);
+  }
+  return $hook;
 }
 
 /**
@@ -83,7 +158,13 @@ function secsyn_permission() {
       'title' => t('Accept syndication'),
       'description' => t('Users will be able to use the service for syndication'),
       'restrict access' => TRUE,
-    )
+    ),
+    'secsyn links default' => array(
+      'title' => t('Manage content servers'),
+      'description' => t('This user will be able to change the defaults for
+        persistent links'),
+      'restrict access' => TRUE,
+    ),
   );
 }
 
@@ -119,7 +200,31 @@ function secsyn_menu() {
       'file' => 'secsyn.pages.inc',
       'type' => MENU_LOCAL_ACTION,
       'weight' => 20,
-    )
+    ),
+    'admin/config/syndication' => array(
+      'title' => 'Syndication Settings',
+      'description' => 'Tools for syndication',
+      'position' => 'right',
+      'weight' => 10,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array('access administration pages'),
+      'file' => 'system.admin.inc',
+      'module' => 'system',
+    ),
+    'admin/config/syndication/links' => array(
+      'title' => 'Content Servers',
+      'description' => 'Control which servers are available to send content to.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_links_admin_form'),
+      'access arguments' => array('secsyn links default'),
+      'file' => 'secsyn.pages.inc',
+    ),
+    'admin/config/syndication/links/servers' => array(
+      'title' => 'Content Servers',
+      'type' => MENU_DEFAULT_LOCAL_TASK & MENU_LOCAL_TASK,
+      'weight' => -10,
+      'access arguments' => array('secsyn links default'),
+    ),
   );
 }
 

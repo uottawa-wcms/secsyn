@@ -1,0 +1,6 @@
+name = Syndication Links
+description = "Enables persistent syndication from this server to other servers"
+core = 7.x
+package = Secure Syndication
+
+dependencies[] = secsyn

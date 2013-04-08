@@ -31,5 +31,11 @@ function secsyn_entity_entity_load(&$entities, $type) {
   }
 }
 
+function secsyn_entity_entity_update($entity, $type) {
+  if (module_exists('secsyn_links')) {
+    secsyn_links_check_object('SecureSyndicationEntityProfile', $entity);
+  }
+}
+
 module_load_include('inc', 'secsyn_entity', 'secsyn_entity.core');
 module_load_include('inc', 'secsyn_entity', 'secsyn_entity.contrib');

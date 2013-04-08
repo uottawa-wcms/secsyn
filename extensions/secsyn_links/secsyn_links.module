@@ -1,0 +1,127 @@
+<?php
+
+function secsyn_links_permission() {
+  return array(
+    'secsyn links' => array(
+      'title' => t('Manage persistent links'),
+      'description' => t('This user will be able to set up persistent links for
+        each piece of content'),
+    ),
+  );
+}
+
+function secsyn_links_secsyn_common_fields_header_alter(&$header) {
+  $header += array(
+    'Persist [Push]' => '100px',
+    'Persist [Pull]' => '100px',
+  );
+}
+
+function secsyn_links_secsyn_common_fields(&$form, $profile, $object, $server) {
+  $existing = secsyn_links_find_link($server, $object, $profile);
+  if (empty($existing)) {
+    $existing = (object) array(
+      'options' => array(
+        'persist' => FALSE,
+        'persist_pull' => FALSE,
+      )
+    );
+  }
+  $form['persist'] = array(
+    '#type' => 'checkbox',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
+    '#default_value' => $existing->options['persist'],
+  );
+  $form['persist_pull'] = array(
+    '#type' => 'checkbox',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
+    '#default_value' => $existing->options['persist_pull'],
+  );
+}
+
+function secsyn_links_twoway_service() {
+  return array(
+    'update_link' => array(
+      'callback' => 'secsyn_links_service_do_update_link',
+      'service_file' => 'services/secsyn_links.update_link.inc',
+      'description' => 'Requests that the remote server establish a persistent link',
+    ),
+  );
+}
+
+function secsyn_links_find_link($server, $object, $profile) {
+  $p = SecureSyndicationProfile::getProfile($profile);
+  $uuid = $p->uuid($object);
+  $row = db_select('secsyn_links_persistent', 'slp')
+      ->fields('slp')
+      ->condition('remote_server', $server)
+      ->condition('object_uuid', $uuid)
+      ->condition('profile_name', $profile)
+      ->execute()
+      ->fetch();
+  $row->options = unserialize($row->options);
+  return $row;
+}
+
+function secsyn_links_create_link($link) {
+  return db_merge('secsyn_links_persistent')
+      ->fields($link)
+      ->key(array(
+        'remote_server' => $link['remote_server'],
+        'object_uuid' => $link['object_uuid'],
+        'profile_name' => $link['profile_name'],
+      ))
+      ->execute();
+}
+
+function secsyn_links_delete_link($link) {
+  return db_delete('secsyn_links_persistent')
+      ->condition('remote_server', $link['remote_server'])
+      ->condition('object_uuid', $link['object_uuid'])
+      ->condition('profile_name', $link['profile_name'])
+      ->execute();
+}
+
+function secsyn_links_secsyn_common_fields_submit($profile, &$object, $server, $settings) {
+  $p = SecureSyndicationProfile::getProfile($profile);
+  $link = array(
+    'remote_server' => $server,
+    'urgent' => $settings['urgent'] ? 'Y' : 'N',
+    'profile_name' => $profile,
+    'object_uuid' => $p->uuid($object),
+    'enabled' => 'Y',
+    'mode' => 'standard',
+    'options' => serialize($settings),
+  );
+  if ($settings['persist']) {
+    secsyn_links_create_link($link);
+  } else {
+    secsyn_links_delete_link($link);
+  }
+  module_load_include('inc', 'secsyn_links', 'services/secsyn_links.update_link');
+  $op = SECSYN_LINKS_CREATE;
+  if (!$settings['persist_pull']) {
+    $op = SECSYN_LINKS_DELETE;
+  }
+  secsyn_links_service_invoke_update_link($link, $op);
+  drupal_set_message(t('Persistent link settings updated'));
+}
+
+function secsyn_links_check_object($profile, $object) {
+  $p = SecureSyndicationProfile::getProfile($profile);
+  $uuid = $p->uuid($object);
+  if (empty($uuid)) {
+    return FALSE;
+  }
+  $rs = db_select('secsyn_links_persistent', 'slp')
+      ->fields('slp', array('remote_server', 'urgent'))
+      ->condition('profile_name', $profile)
+      ->condition('object_uuid', $p->uuid($object))
+      ->condition('enabled', 'Y')
+      ->execute();
+  foreach ($rs as $row) {
+    _secsyn_fast_queue($row->remote_server, $profile, $object, $row->urgent == 'Y');
+  }
+}

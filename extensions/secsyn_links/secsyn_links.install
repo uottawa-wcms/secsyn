@@ -1,0 +1,88 @@
+<?php
+
+function secsyn_links_schema() {
+  return array(
+    'secsyn_links_persistent' => _secsyn_links_schema_persistent(),
+  );
+}
+
+/**
+ * Table definition for secsyn_links_persistent
+ */
+function _secsyn_links_schema_persistent() {
+  return array(
+    'fields' => array(
+      'plid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'normal',
+      ),
+      'remote_server' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'urgent' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+        'default' => 'N',
+      ),
+      'options' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+      'profile_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'object_uuid' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'enabled' => array(
+        'type' => 'char',
+        'length' => 1,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+        'default' => 'Y',
+      ),
+      'mode' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+    ),
+    'primary key' => array(
+      'plid',
+    ),
+    'unique keys' => array(
+      'one_item_per_server' => array(
+        'remote_server',
+        'object_uuid',
+        'profile_name',
+      ),
+    ),
+    'indexes' => array(
+      'remote_server' => array('remote_server'),
+      'urgent' => array('urgent'),
+      'enabled' => array('enabled'),
+    ),
+  );
+}
