@@ -9,7 +9,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
   public function package($object) {
     $schema = $this->getSchema($object->table);
     unset($object->{$schema['export']['primary key']});
-    unset($object->export_type);)
+    unset($object->export_type);
     return $object;
   }
 
