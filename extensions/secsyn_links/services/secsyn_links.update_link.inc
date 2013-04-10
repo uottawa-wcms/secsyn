@@ -22,7 +22,7 @@ function secsyn_links_service_invoke_update_link($link, $op = SECSYN_LINKS_CREAT
 
 function secsyn_links_service_do_update_link($args) {
   $args = (array) $args;
-  if ($op == SECSYN_LINKS_DELETE) {
+  if ($args['op'] == SECSYN_LINKS_DELETE) {
     return secsyn_links_delete_link($args['link']);
   } else {
     return secsyn_links_create_link($args['link']);

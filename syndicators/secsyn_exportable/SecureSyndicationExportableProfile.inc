@@ -2,6 +2,26 @@
 
 class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
 
+  public function children($object) {
+    $deps = array();
+    $modules = module_implements('secsyn_exportable_children');
+    foreach ($modules as $module) {
+      $hook = $module . '_secsyn_exportable_children';
+      $deps = array_merge($deps, $hook($object));
+    }
+    return $deps;
+  }
+
+  public function dependencies($object) {
+    $deps = array();
+    $modules = module_implements('secsyn_exportable_dependencies');
+    foreach ($modules as $module) {
+      $hook = $module . '_secsyn_exportable_dependencies';
+      $deps = array_merge($deps, $hook($object));
+    }
+    return $deps;
+  }
+
   public function __construct() {
     ctools_include('export');
   }
@@ -9,6 +29,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
   public function package($object) {
     $schema = $this->getSchema($object->table);
     unset($object->{$schema['export']['primary key']});
+    unset($object->export_type);
     return $object;
   }
 
@@ -18,9 +39,13 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
     if ($existing) {
       $schema = $this->getSchema($pieces[0]);
       $fields->{$schema['export']['primary key']} = $existing->{$schema['export']['primary key']};
+      $fields->export_type = EXPORT_IN_DATABASE;
     }
     $fields = (object) (((array) $fields) + ((array) ctools_export_new_object($pieces[0])));
-    return ctools_export_crud_save($pieces[0], $fields);
+    watchdog('secsyn_exportable', var_export($fields, TRUE));
+    $results = ctools_export_crud_save($pieces[0], $fields);
+    watchdog('secsyn_exportable', 'results: ' . var_export($results, TRUE));
+    return $results;
   }
 
   public function lookup($uuid) {
@@ -46,13 +71,3 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
   }
 
 }
-/*
- *
-  ctools_include('export');
-  $tables = ctools_export_get_schemas();
-  echo '<pre>';
-  foreach ($tables as $table_name => $data) {
-    echo $table_name . '<br />';
-  }
-  echo '</pre>';
- */
