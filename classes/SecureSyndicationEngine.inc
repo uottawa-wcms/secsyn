@@ -510,7 +510,7 @@ class SecureSyndicationEngine {
       $this->syndication_queue = UniqueQueue::get('secsyn_syndication');
     }
     if ($this->syndication_queue->createItem($data, serialize($data), $urgent ? 1 : 0)) {
-      $this->log('SSSQ: item [@uuid] successfully queued');
+      $this->log('SSSQ: item [@uuid] successfully queued', array('@uuid' => $uuid));
       return TRUE;
     }
     return FALSE;

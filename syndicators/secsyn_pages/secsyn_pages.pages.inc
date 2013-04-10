@@ -1,5 +1,23 @@
 <?php
 
+function secsyn_pages_secsyn_exportable_children($object) {
+  $deps = array();
+  if ($object->table == 'page_manager_pages') {
+    $handlers = db_select('page_manager_handlers', 'pmh')
+        ->condition('pmh.task', 'page')
+        ->condition('pmh.subtask', $object->name)
+        ->fields('pmh')
+        ->execute();
+    foreach ($handlers as $handler) {
+      $deps[] = array(
+        'profile' => 'SecureSyndicationExportableProfile',
+        'object' => $handler,
+      );
+    }
+  }
+  return $deps;
+}
+
 function _secsyn_pages_load_pages_list() {
   $rs = db_select('page_manager_pages', 'pmp')
       ->fields('pmp', array('name', 'admin_title'))
