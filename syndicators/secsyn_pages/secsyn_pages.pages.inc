@@ -1,23 +1,5 @@
 <?php
 
-function secsyn_pages_secsyn_exportable_children($object) {
-  $deps = array();
-  if ($object->table == 'page_manager_pages') {
-    $handlers = db_select('page_manager_handlers', 'pmh')
-        ->condition('pmh.task', 'page')
-        ->condition('pmh.subtask', $object->name)
-        ->fields('pmh')
-        ->execute();
-    foreach ($handlers as $handler) {
-      $deps[] = array(
-        'profile' => 'SecureSyndicationExportableProfile',
-        'object' => $handler,
-      );
-    }
-  }
-  return $deps;
-}
-
 function _secsyn_pages_load_pages_list() {
   $rs = db_select('page_manager_pages', 'pmp')
       ->fields('pmp', array('name', 'admin_title'))
@@ -55,7 +37,7 @@ function secsyn_pages_syndicate_form($form, &$form_state) {
       '#value' => $form_state['values']['page'],
     );
     $page = ctools_export_crud_load('page_manager_pages', $form_state['values']['page']);
-    _secsyn_common_fields($form, $page, 'SecureSyndicationExportableProfile');
+    _secsyn_common_fields($form, $page, 'SecureSyndicationPageManagerProfile');
     $form['syndicate'] = array(
       '#type' => 'submit',
       '#value' => t('Syndicate'),
@@ -67,7 +49,7 @@ function secsyn_pages_syndicate_form($form, &$form_state) {
 function secsyn_pages_syndicate_form_submit($form, &$form_state) {
   ctools_include('export');
   $page = ctools_export_crud_load('page_manager_pages', $form_state['values']['page']);
-  _secsyn_common_fields_submit('SecureSyndicationExportableProfile', $page, $form_state);
+  _secsyn_common_fields_submit('SecureSyndicationPageManagerProfile', $page, $form_state);
   drupal_set_message(t('Object queued for syndication'));
   $form_state['redirect'] = 'admin/structure/pages';
 }
