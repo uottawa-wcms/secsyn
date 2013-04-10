@@ -68,6 +68,7 @@ class SecureSyndicationEntityProfile extends SecureSyndicationProfile {
   }
 
   public function update($uuid, $fields) {
+    watchdog('test', 'updating: ' . $uuid);
     $fields = (object) $fields;
     $uuid = $this->splitUUID($uuid);
     $info = entity_get_info($uuid['entity_type']);

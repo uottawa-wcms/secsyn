@@ -9,6 +9,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
   public function package($object) {
     $schema = $this->getSchema($object->table);
     unset($object->{$schema['export']['primary key']});
+    unset($object->export_type);)
     return $object;
   }
 
@@ -19,7 +20,11 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
       $schema = $this->getSchema($pieces[0]);
       $fields->{$schema['export']['primary key']} = $existing->{$schema['export']['primary key']};
     }
-    return ctools_export_crud_save($pieces[0], $fields);
+    $fields = (object) (((array) $fields) + ((array) ctools_export_new_object($pieces[0])));
+    watchdog('secsyn_exportable', var_export($fields, TRUE));
+    $results = ctools_export_crud_save($pieces[0], $fields);
+    watchdog('secsyn_exportable', 'results: ' . var_export($results, TRUE));
+    return $results;
   }
 
   public function lookup($uuid) {
