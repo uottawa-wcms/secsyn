@@ -19,6 +19,7 @@ class SecureSyndicationExportableProfile extends SecureSyndicationProfile {
       $schema = $this->getSchema($pieces[0]);
       $fields->{$schema['export']['primary key']} = $existing->{$schema['export']['primary key']};
     }
+    $fields = (object) (((array) $fields) + ((array) ctools_export_new_object($pieces[0])));
     return ctools_export_crud_save($pieces[0], $fields);
   }
 
