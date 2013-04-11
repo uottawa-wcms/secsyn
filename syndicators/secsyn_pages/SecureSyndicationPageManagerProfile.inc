@@ -11,6 +11,7 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
     $package['page'] = (array) $object;
     $this->packageHandlers($package);
     unset($package['page']['pid']);
+    watchdog('test', var_export($package, TRUE));
     return $package;
   }
 
@@ -50,6 +51,9 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
   }
 
   private function packageDisplay(&$display) {
+    $display['layout_settings'] = unserialize($display['layout_settings']);
+    $display['panel_settings'] = unserialize($display['panel_settings']);
+    $display['cache'] = unserialize($display['cache']);
     $display['_panes'] = array();
     $panes = db_select('pp')
         ->fields('pp')
@@ -57,6 +61,13 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
         ->execute();
     foreach ($panes as $pane) {
       $packaged_pane = (array) $pane;
+      $pane['access'] = unserialize($pane['access']);
+      $pane['configuration'] = unserialize($pane['configuration']);
+      $pane['cache'] = unserialize($pane['cache']);
+      $pane['style'] = unserialize($pane['style']);
+      $pane['css'] = unserialize($pane['css']);
+      $pane['extras'] = unserialize($pane['extras']);
+      $pane['locks'] = unserialize($pane['locks']);
       unset($packaged_pane['pid']);
       unset($packaged_pane['did']);
       $display['_panes'] = $packaged_pane;
@@ -75,13 +86,15 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
           'name' => $fields['page']['name']
         ))
         ->execute();
-    foreach ($page['handlers'] as $handler) {
-      $display = $handler['_display'];
+    foreach ($fields['handlers'] as $handler) {
+      $display = (array) $handler['_display'];
       unset($handler['_display']);
       $panes = $display['_panes'];
       unset($display['_panes']);
       drupal_write_record('panels_display', $display);
+      watchdog('test', var_export($panes, TRUE));
       foreach ($panes as $pane) {
+        $pane = (array) $pane;
         $pane['did'] = $display['did'];
         drupal_write_record('panels_pane', $pane);
       }
@@ -120,7 +133,6 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
   public function lookup($uuid) {
     $page = db_select('page_manager_pages', 'pmp')
         ->fields('pmp')
-        ->condition('page_manager_pages')
         ->condition('name', $uuid)
         ->execute()
         ->fetch();
