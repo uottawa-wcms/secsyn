@@ -42,7 +42,7 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
           ->execute()
           ->fetch();
       $packaged_display = (array) $display;
-      $this->packageDisplay($display);
+      $this->packageDisplay($packaged_display);
       unset($packaged_display['did']);
       $handler['_display'] = $display;
     }
@@ -51,7 +51,7 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
 
   private function packageDisplay(&$display) {
     $display['_panes'] = array();
-    $panes = db_select('pp')
+    $panes = db_select('panels_pane', 'pp')
         ->fields('pp')
         ->condition('did', $display['did'])
         ->execute();
@@ -120,7 +120,6 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
   public function lookup($uuid) {
     $page = db_select('page_manager_pages', 'pmp')
         ->fields('pmp')
-        ->condition('page_manager_pages')
         ->condition('name', $uuid)
         ->execute()
         ->fetch();
