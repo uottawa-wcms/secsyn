@@ -61,13 +61,13 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
         ->execute();
     foreach ($panes as $pane) {
       $packaged_pane = (array) $pane;
-      $pane['access'] = unserialize($pane['access']);
-      $pane['configuration'] = unserialize($pane['configuration']);
-      $pane['cache'] = unserialize($pane['cache']);
-      $pane['style'] = unserialize($pane['style']);
-      $pane['css'] = unserialize($pane['css']);
-      $pane['extras'] = unserialize($pane['extras']);
-      $pane['locks'] = unserialize($pane['locks']);
+      $packaged_pane['access'] = unserialize($packaged_pane['access']);
+      $packaged_pane['configuration'] = unserialize($packaged_pane['configuration']);
+      $packaged_pane['cache'] = unserialize($packaged_pane['cache']);
+      $packaged_pane['style'] = unserialize($packaged_pane['style']);
+      $packaged_pane['css'] = unserialize($packaged_pane['css']);
+      $packaged_pane['extras'] = unserialize($packaged_pane['extras']);
+      $packaged_pane['locks'] = unserialize($packaged_pane['locks']);
       unset($packaged_pane['pid']);
       unset($packaged_pane['did']);
       $display['_panes'] = $packaged_pane;
@@ -117,11 +117,11 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
     foreach ($handlers as $handler) {
       if ($handler->handler == 'panels_context') {
         $did = $handler->conf['did'];
-        db_delete('panel_panes')
+        db_delete('panels_pane')
             ->condition('did', $did)
             ->execute();
       }
-      db_delete('panel_display')
+      db_delete('panels_display')
           ->condition('did', $did)
           ->execute();
       db_delete('page_manager_handlers')
