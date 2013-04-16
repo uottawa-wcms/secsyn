@@ -11,7 +11,6 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
     $package['page'] = (array) $object;
     $this->packageHandlers($package);
     unset($package['page']['pid']);
-    watchdog('test', var_export($package, TRUE));
     return $package;
   }
 
@@ -45,7 +44,7 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
       $packaged_display = (array) $display;
       $this->packageDisplay($packaged_display);
       unset($packaged_display['did']);
-      $handler['_display'] = $display;
+      $handler['_display'] = $packaged_display;
     }
     unset($handler['conf']['did']);
   }
@@ -70,7 +69,7 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
       $packaged_pane['locks'] = unserialize($packaged_pane['locks']);
       unset($packaged_pane['pid']);
       unset($packaged_pane['did']);
-      $display['_panes'] = $packaged_pane;
+      $display['_panes'][] = $packaged_pane;
     }
   }
 
@@ -92,7 +91,6 @@ class SecureSyndicationPageManagerProfile extends SecureSyndicationProfile {
       $panes = $display['_panes'];
       unset($display['_panes']);
       drupal_write_record('panels_display', $display);
-      watchdog('test', var_export($panes, TRUE));
       foreach ($panes as $pane) {
         $pane = (array) $pane;
         $pane['did'] = $display['did'];
