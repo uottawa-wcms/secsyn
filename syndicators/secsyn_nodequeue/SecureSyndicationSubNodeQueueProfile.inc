@@ -40,7 +40,7 @@ class SecureSyndicationSubNodeQueueProfile extends SecureSyndicationProfile {
     if (empty($queue)) {
       return FALSE;
     }
-    return secsyn_nodequeue_load_subqueue_by_reference($queue->qid, $pieces[1]);
+    return (object) secsyn_nodequeue_load_subqueue_by_reference($queue->qid, $pieces[1]);
   }
 
   public function uuid($object) {

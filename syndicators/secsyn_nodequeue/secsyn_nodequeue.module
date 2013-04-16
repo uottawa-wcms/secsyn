@@ -14,7 +14,7 @@ function secsyn_nodequeue_load_subqueue_by_reference($qid, $reference) {
       ->condition('qid', $qid)
       ->condition('reference', $reference)
       ->execute()
-      ->fetch();
+      ->fetchObject();
 }
 
 function secsyn_nodequeue_menu() {

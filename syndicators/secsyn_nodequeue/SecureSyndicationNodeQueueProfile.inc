@@ -34,7 +34,7 @@ class SecureSyndicationNodeQueueProfile extends SecureSyndicationProfile {
   }
 
   public function lookup($uuid) {
-    return nodequeue_load_queue_by_name($uuid);
+    return (object) nodequeue_load_queue_by_name($uuid);
   }
 
   public function uuid($object) {
