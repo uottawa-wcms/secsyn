@@ -1,0 +1,12 @@
+name = Node Queue Syndication
+description = "Provides syndication for node queues"
+core = 7.x
+package = "Secure Syndication"
+
+files[] = SecureSyndicationNodeQueueProfile.inc
+files[] = SecureSyndicationSubNodeQueueProfile.inc
+files[] = SecureSyndicationNodeQueueEntryProfile.inc
+
+dependencies[] = nodequeue
+dependencies[] = secsyn
+dependencies[] = secsyn_entity

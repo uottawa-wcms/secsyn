@@ -1,0 +1,30 @@
+<?php
+
+function secsyn_nodequeue_secsyn_profiles() {
+  return array(
+    'SecureSyndicationNodeQueueProfile' => t('Nodequeues'),
+    'SecureSyndicationSubNodeQueueProfile' => t('Subqueues'),
+    'SecureSyndicationNodeQueueEntry' => t('Nodequeue Entries'),
+  );
+}
+
+function secsyn_nodequeue_load_subqueue_by_reference($qid, $reference) {
+  return db_select('nodequeue_subqueue', 'sq')
+      ->fields('sq')
+      ->condition('qid', $qid)
+      ->condition('reference', $reference)
+      ->execute()
+      ->fetch();
+}
+
+function secsyn_nodequeue_menu() {
+  return array(
+    'admin/structure/nodequeue/%nodequeue/syndicate' => array(
+      'title' => 'Syndicate',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('secsyn_nodequeue_syndication_form', 3),
+      'access arguments' => array('syndicate object'),
+      'file' => 'secsyn_nodequeue.pages.inc',
+    ),
+  );
+}

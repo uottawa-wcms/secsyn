@@ -86,7 +86,7 @@ function secsyn_links_delete_link($link) {
       ->execute();
 }
 
-function secsyn_links_secsyn_common_fields_submit($profile, &$object, $server, $settings) {
+function secsyn_links_secsyn_common_fields_submit($profile, &$object, $server, $settings, $messages = TRUE) {
   $p = SecureSyndicationProfile::getProfile($profile);
   $link = array(
     'remote_server' => $server,
@@ -108,7 +108,9 @@ function secsyn_links_secsyn_common_fields_submit($profile, &$object, $server, $
     $op = SECSYN_LINKS_DELETE;
   }
   secsyn_links_service_invoke_update_link($link, $op);
-  drupal_set_message(t('Persistent link settings updated'));
+  if ($messages) {
+    drupal_set_message(t('Persistent link settings updated'));
+  }
 }
 
 function secsyn_links_check_object($profile, $object) {

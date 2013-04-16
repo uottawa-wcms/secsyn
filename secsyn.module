@@ -28,15 +28,15 @@ function _secsyn_fast_queue($remote_machine_name, $profile, $object, $urgent = F
 /**
  *
  */
-function _secsyn_common_fields_submit($profile, &$object, &$form_state) {
+function _secsyn_common_fields_submit($profile, &$object, &$form_state, $show_messages = TRUE) {
   foreach ($form_state['values']['syndication'] as $server_machine_name => $syndication_settings) {
     if ($syndication_settings['syndicate']) {
-      _secsyn_fast_queue($server_machine_name, $profile, $object, $syndication_settings['urgent']);
+      _secsyn_fast_queue($server_machine_name, $profile, $object, $syndication_settings['urgent'], $show_messages);
     }
     $modules = module_implements('secsyn_common_fields_submit');
     foreach ($modules as $module) {
       $hook = $module . '_secsyn_common_fields_submit';
-      $hook($profile, $object, $server_machine_name, $syndication_settings);
+      $hook($profile, $object, $server_machine_name, $syndication_settings, $show_messages);
     }
   }
 }
