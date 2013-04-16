@@ -32,7 +32,11 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
     $queue = nodequeue_load_queue_by_name($data['queue_name']);
     $subqueue = secsyn_nodequeue_load_subqueue_by_reference($data['queue_name'], $data['subqueue_reference']);
     db_merge('nodequeue_nodes')
-        ->fields($fields)
+        ->fields($fields + array(
+          'nid' => $node->nid,
+          'qid' => $queue->qid,
+          'sqid' => $subqueue->qid,
+        ))
         ->key(array(
           'nid' => $node->nid,
           'qid' => $queue->qid,
