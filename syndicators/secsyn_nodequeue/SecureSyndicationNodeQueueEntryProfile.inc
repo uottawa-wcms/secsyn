@@ -3,13 +3,6 @@
 class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
 
   public function dependencies($object) {
-    if (!is_object($object)) {
-      print '<pre>';
-      var_dump($object);
-      print '<hr />';
-      debug_print_backtrace();
-      die();
-    }
     $dependencies = array();
     $queue = db_select('nodequeue_subqueue', 'sq');
     $queue->fields('sq');
@@ -53,17 +46,14 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
     $nodes = entity_uuid_load('node', array($data['node_uuid']));
     $node = reset($nodes);
     if (empty($node)) {
-      var_dump('no node');
       return FALSE;
     }
     $queue = nodequeue_load_queue_by_name($data['queue_name']);
     if (empty($queue)) {
-      var_dump('no queue');
       return FALSE;
     }
     $subqueue = secsyn_nodequeue_load_subqueue_by_reference($queue->qid, $data['subqueue_reference']);
     if (empty($subqueue)) {
-      var_dump('no subqueue');
       return FALSE;
     }
     return db_select('nodequeue_nodes', 'nqn')
