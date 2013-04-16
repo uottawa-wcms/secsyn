@@ -29,7 +29,8 @@ class SecureSyndicationNodeQueueProfile extends SecureSyndicationProfile {
       $fields['name'] = $uuid;
       $fields['qid'] = $existing->qid;
     }
-    nodequeue_save((object) $fields);
+    $obj = (object) $fields;
+    nodequeue_save($obj);
   }
 
   public function lookup($uuid) {

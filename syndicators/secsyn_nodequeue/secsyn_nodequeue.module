@@ -25,6 +25,8 @@ function secsyn_nodequeue_menu() {
       'page arguments' => array('secsyn_nodequeue_syndication_form', 3),
       'access arguments' => array('syndicate object'),
       'file' => 'secsyn_nodequeue.pages.inc',
+      'type' => MENU_LOCAL_TASK,
     ),
   );
 }
+

@@ -4,12 +4,14 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
 
   public function dependencies($object) {
     return array(
-      'profile' => 'SecureSyndicationSubNodeQueueProfile',
-      'object' => db_select('nodequeue_subqueue', 'sq')
-          ->fields('sq')
-          ->condition('sqid', $object->sqid)
-          ->execute()
-          ->fetch()
+      array(
+        'profile' => 'SecureSyndicationSubNodeQueueProfile',
+        'object' => db_select('nodequeue_subqueue', 'sq')
+            ->fields('sq')
+            ->condition('sqid', $object->sqid)
+            ->execute()
+            ->fetch()
+      ),
     );
   }
 
@@ -38,7 +40,8 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
 
   public function lookup($uuid) {
     $data = unserialize($uuid);
-    $node = reset(entity_uuid_load('node', array($data['node_uuid'])));
+    $nodes = entity_uuid_load('node', array($data['node_uuid']));
+    $node = reset($nodes);
     if (empty($node)) {
       return FALSE;
     }
@@ -63,6 +66,7 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
     $uuid = array();
     $queue = nodequeue_load($object->qid);
     $subqueue = db_select('nodequeue_subqueue', 'sq')
+        ->fields('sq')
         ->condition('qid', $object->qid)
         ->condition('sqid', $object->sqid)
         ->execute()
