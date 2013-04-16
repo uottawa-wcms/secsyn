@@ -1,0 +1,37 @@
+<?php
+
+define('SECSYN_LOG_QUEUED', 'queued');
+define('SECSYN_LOG_VALIDATED', 'validated');
+define('SECSYN_LOG_INVALIDATED', 'invalidated');
+define('SECSYN_LOG_UPDATED', 'updated');
+define('SECSYN_LOG_ERROR', 'error');
+
+function secsyn_log_event($action, $remote_server, $uuid, $profile) {
+  drupal_write_record('secsyn_logs', array(
+    'action' => $action,
+    'timestamp' => time(),
+    'remote' => $remote_server,
+    'uuid' => $uuid,
+    'profile' => $profile,
+  ));
+}
+
+function secsyn_log_secsyn_error($data) {
+  secsyn_log_event(SECSYN_LOG_ERROR, $data['remote_server'], $data['uuid'], $data['profile']);
+}
+
+function secsyn_log_secsyn_queued($data) {
+  secsyn_log_event(SECSYN_LOG_QUEUED, $data['remote_server'], $data['uuid'], $data['profile']);
+}
+
+function secsyn_log_secsyn_validated($data) {
+  secsyn_log_event(SECSYN_LOG_VALIDATED, $data['remote_server'], $data['uuid'], $data['profile']);
+}
+
+function secsyn_log_secsyn_invalidated($data) {
+  secsyn_log_event(SECSYN_LOG_INVALIDATED, $data['remote_server'], $data['uuid'], $data['profile']);
+}
+
+function secsyn_log_secsyn_updated($data) {
+  secsyn_log_event(SECSYN_LOG_UPDATED, $data['remote_server'], $data['uuid'], $data['profile']);
+}

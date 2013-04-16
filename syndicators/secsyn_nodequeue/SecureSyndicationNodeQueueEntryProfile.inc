@@ -31,16 +31,18 @@ class SecureSyndicationNodeQueueEntryProfile extends SecureSyndicationProfile {
     $node = reset(entity_uuid_load('node', array($data['node_uuid'])));
     $queue = nodequeue_load_queue_by_name($data['queue_name']);
     $subqueue = secsyn_nodequeue_load_subqueue_by_reference($queue->qid, $data['subqueue_reference']);
+    $fields += array(
+      'nid' => $node->nid,
+      'qid' => $queue->qid,
+      'sqid' => $subqueue->sqid,
+    );
+
     db_merge('nodequeue_nodes')
-        ->fields($fields + array(
-          'nid' => $node->nid,
-          'qid' => $queue->qid,
-          'sqid' => $subqueue->qid,
-        ))
+        ->fields($fields)
         ->key(array(
           'nid' => $node->nid,
           'qid' => $queue->qid,
-          'sqid' => $subqueue->qid,
+          'sqid' => $subqueue->sqid,
         ))
         ->execute();
   }

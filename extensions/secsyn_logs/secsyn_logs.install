@@ -1,0 +1,62 @@
+<?php
+
+function secsyn_logs_schema() {
+  return array(
+    'secsyn_logs' => _secsyn_logs_schema_logs(),
+  );
+}
+
+/**
+ * Table definition for secsyn_logs_logs
+ */
+function _secsyn_logs_schema_logs() {
+  return array(
+    'fields' => array(
+      'lid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'normal',
+      ),
+      'action' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'remote' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'uuid' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+      'profile' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'serialize' => FALSE,
+        'binary' => FALSE,
+      ),
+    ),
+    'primary key' => array(
+      'lid',
+    ),
+    'unique keys' => array(),
+    'indexes' => array(),
+  );
+}

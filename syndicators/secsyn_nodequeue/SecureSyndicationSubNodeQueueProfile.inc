@@ -26,12 +26,16 @@ class SecureSyndicationSubNodeQueueProfile extends SecureSyndicationProfile {
     $fields['qid'] = $queue->qid;
     unset($fields['queue_name']);
     $existing = $this->lookup($uuid);
-    $keys = array();
     if (!empty($existing)) {
       $fields['sqid'] = $existing->sqid;
-      $keys[] = 'sqid';
+    } else {
     }
-    drupal_write_record('nodequeue_subqueues', $fields, $keys);
+    db_merge('nodequeue_subqueue')
+        ->fields($fields)
+        ->key(array(
+          'sqid' => isset($fields['sqid']) ? $fields['sqid'] : NULL,
+        ))
+        ->execute();
   }
 
   public function lookup($uuid) {

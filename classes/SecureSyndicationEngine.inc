@@ -123,6 +123,14 @@ class SecureSyndicationEngine {
     }
   }
 
+  private function invokeError($remote = NULL, $profile = NULL, $uuid = NULL) {
+    module_invoke_all('secsyn_error', array(
+      'remote_server' => $remote,
+      'profile' => $profile,
+      'uuid' => $uuid,
+    ));
+  }
+
   /**
    * Adds an item to the wait queue.
    *
@@ -146,6 +154,7 @@ class SecureSyndicationEngine {
       $this->log('Unable to add object to wait queue, invalid profile [@profile]', array(
         '@profile' => $synprofile_name,
       ), WATCHDOG_ERROR);
+      $this->invokeError($remote_server, $synprofile_name, NULL);
       return FALSE;
     }
     $uuid = $profile->uuid($object);
@@ -153,6 +162,7 @@ class SecureSyndicationEngine {
       $this->log('Unable to add object to wait queue, profile could not generate UUID [@profile]', array(
         '@profile' => $synprofile_name,
       ), WATCHDOG_ERROR);
+      $this->invokeError($remote_server, $synprofile_name, NULL);
       return FALSE;
     }
     $data = array(
@@ -176,6 +186,7 @@ class SecureSyndicationEngine {
         '@remote' => $remote_server,
         '@profile' => $synprofile_name,
       ));
+      module_invoke_all('secsyn_queued', $data);
     }
     return $result;
   }
@@ -231,6 +242,7 @@ class SecureSyndicationEngine {
         $this->log('Could not load profile for a dependency [@profile]', array(
           '@profile' => $dependency['profile'],
         ), WATCHDOG_ERROR);
+        $this->invokeError($remote_server, $dependency['profile'], NULL);
         return FALSE;
       }
       $dep_uuid = $dep_profile->uuid($dependency['object']);
@@ -239,6 +251,7 @@ class SecureSyndicationEngine {
           '@uuid' => $dep_uuid,
           '@profile' => $dependency['profile'],
         ), WATCHDOG_ERROR);
+        $this->invokeError($remote_server, $dependency['profile'], $dep_uuid);
         return FALSE;
       }
     }
@@ -267,6 +280,7 @@ class SecureSyndicationEngine {
         $this->log('Could not load profile for child [@profile]', array(
           '@profile' => $child['profile'],
         ), WATCHDOG_ERROR);
+        $this->invokeError($remote_server, $child['profile']);
         return FALSE;
       }
       $uuid = $profile->uuid($child['object']);
@@ -275,6 +289,7 @@ class SecureSyndicationEngine {
           '@uuid' => $uuid,
           '@profile' => $child['profile'],
         ), WATCHDOG_ERROR);
+        $this->invokeError($remote_server, $child['profile'], $uuid);
         return FALSE;
       }
     }
@@ -294,6 +309,7 @@ class SecureSyndicationEngine {
   private function queueForValidation($remote_server, $synprofile_name, $uuid, $urgent = FALSE) {
     if (empty($uuid)) {
       $this->log('Could not queue object for validation, empty UUID');
+      $this->invokeError($remote_server, $synprofile_name, $uuid);
       return FALSE;
     }
     $profile = SecureSyndicationProfile::getProfile($synprofile_name);
@@ -465,6 +481,7 @@ class SecureSyndicationEngine {
     if (!count($original_items)) {
       return FALSE;
     }
+    $ignore = array();
     foreach ($batch as $remote_server => $items) {
       $this->log('Sending batch to [@remote] with [@count] item(s)', array(
         '@remote' => $remote_server,
@@ -477,10 +494,18 @@ class SecureSyndicationEngine {
       ));
       foreach ($results as $result_id) {
         $this->queueForSyndication($remote_server, $items[$result_id]['profile'], $items[$result_id]['uuid'], $items[$result_id]['urgent']);
+        $item = $items[$result_id] + array(
+          'remote_server' => $remote_server,
+        );
+        module_invoke_all('secsyn_invalidated', $item);
+        $ignore[$item['remote_server']][] = $item['uuid'];
       }
     }
     foreach ($original_items as $item) {
       $this->check_queue->deleteItem($item);
+      if (!in_array($ignore[$item->data['remote_server']], $item->data['uuid'])) {
+        module_invoke_all('secsyn_validated', $item->data);
+      }
     }
     $this->log('Verification complete');
     return TRUE;
@@ -605,6 +630,10 @@ class SecureSyndicationEngine {
       ));
       module_load_include('inc', 'secsyn', 'services/secsyn.sync');
       secsyn_service_invoke_sync($remote_server, $update_list);
+      foreach ($update_list as $item) {
+        $item['remote_server'] = $remote_server;
+        module_invoke_all('secsyn_updated', $item);
+      }
     }
     foreach ($items as $item) {
       $this->syndication_queue->deleteItem($item);

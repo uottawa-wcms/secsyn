@@ -1,0 +1,6 @@
+name = Secure Syndication Logs
+description = "Provides logging functionality for secure syndication"
+core = 7.x
+package = "Secure Syndication"
+
+dependencies[] = secsyn
